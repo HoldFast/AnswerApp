@@ -1,0 +1,7 @@
+C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\bin\AnswerApp.dll
+C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\bin\AnswerApp.pdb
+C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\bin\EntityFramework.dll
+C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\bin\EntityFramework.xml
+C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\obj\Debug\AnswerApp.dll
+C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\obj\Debug\AnswerApp.pdb
