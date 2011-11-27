@@ -23,6 +23,14 @@
                     <%: Html.TextBoxFor(m => m.FirstName) %>
                     <%: Html.ValidationMessageFor(m => m.FirstName) %>
                 </div>
+                
+                <div class="editor-label">
+                    <%: Html.LabelFor(m => m.LastName) %>
+                </div>
+                <div class="editor-field">
+                    <%: Html.TextBoxFor(m => m.LastName) %>
+                    <%: Html.ValidationMessageFor(m => m.LastName) %>
+                </div>
                     
                 <div class="editor-label">
                     <%: Html.LabelFor(m => m.UserName) %>
@@ -61,13 +69,7 @@
             </p>
             </td>
             <td valign=top>
-                <div class="editor-label">
-                    <%: Html.LabelFor(m => m.LastName) %>
-                </div>
-                <div class="editor-field">
-                    <%: Html.TextBoxFor(m => m.LastName) %>
-                    <%: Html.ValidationMessageFor(m => m.LastName) %>
-                </div>
+                
             </td>
         </table>
     <% } %>

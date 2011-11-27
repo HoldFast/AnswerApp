@@ -54,6 +54,7 @@ namespace AnswerApp.Controllers
 
     public class AnswersController : Controller
     {
+        String Filename_of_Solution_to_Purchase = null;
         //
         // GET: /Answers/
 
@@ -210,6 +211,59 @@ namespace AnswerApp.Controllers
 
         public ActionResult Pay(SelectModel model)
         {
+            AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+            AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
+            if (thisUser == null) { RedirectToAction("LogOn", "Account"); }
+
+            String filename = "" + model.Textbook +
+                              "_" + model.Unit +
+                              "_" + model.Chapter +
+                              "_" + model.Section +
+                              "_" + model.Page +
+                              "_" + model.Question + ".pdf";
+
+            /*TO DO
+             * Go through all previous purchases and 
+             * erase them from the user's List of Answers:
+             * Use String.Replace to finally replace the Purchase_ clause
+             * Then split the answer string based on the 
+             * replacing string (which must also be a single character) 
+             * "*" for example.
+             * Save each component of the string so that it can be 
+             * reconstructed to the original answer string for that user
+             * The frist string in the array will be al answers 
+             * before the recent purcahse, the following strings will be
+             * all purchases after that one.
+             * It is important to note that all of the strings other than the first
+             * will be ones that started with purchase meaning they will have the
+             * answer that has just been purchased plus all answers already payed for
+             * after that purcahase up until the next new purchase.
+             * Each of these substrings should be split on the ';' character to isolate 
+             * the file name of the solution just purchased.  
+             * 
+             * Or the easy way is to replace "Purchase_" with "".
+             * //*/
+            thisUser.Answers += "" + "Purchase_" + filename + ";";//Purchase indicates that the item is not yet payed for.
+            //Filename_of_Solution_to_Purchase = "";
+            //Filename_of_Solution_to_Purchase = filename;// +";";
+
+            model.CorrectAnswer = "Error 3";
+            IQueryable<Question> retrieved2 = from theAnswers in db.Questions
+                                              where theAnswers.Textbook_Title.Equals(model.Textbook)
+                                              && theAnswers.Unit_Title.Equals(model.Unit)
+                                              && theAnswers.Chapter_Title.Equals(model.Chapter)
+                                              && theAnswers.Section_Title.Equals(model.Section)
+                                              && theAnswers.Page_Number.Equals(model.Page)
+                                              && theAnswers.Question_Number.Equals(model.Question)
+                                              select theAnswers;
+            Question[] results2 = retrieved2.ToArray<Question>();
+            if (results2.Length != 0)
+            {
+                model.CorrectAnswer = results2.First().Practice_Problem_Answer;
+            }
+
+            db.SubmitChanges();
+            
             return View(model);
         }
 
@@ -227,7 +281,30 @@ namespace AnswerApp.Controllers
                               "_" + model.Page +
                               "_" + model.Question + ".pdf";
 
-            thisUser.Answers += filename + ";";
+            /*TO DO
+             * Go through all previous purchases and 
+             * erase them from the user's List of Answers:
+             * Use String.Replace to finally replace the Purchase_ clause
+             * Then split the answer string based on the 
+             * replacing string (which must also be a single character) 
+             * "*" for example.
+             * Save each component of the string so that it can be 
+             * reconstructed to the original answer string for that user
+             * The frist string in the array will be al answers 
+             * before the recent purcahse, the following strings will be
+             * all purchases after that one.
+             * It is important to note that all of the strings other than the first
+             * will be ones that started with purchase meaning they will have the
+             * answer that has just been purchased plus all answers already payed for
+             * after that purcahase up until the next new purchase.
+             * Each of these substrings should be split on the ';' character to isolate 
+             * the file name of the solution just purchased.  
+             * 
+             * Or the easy way is to replace "Purchase_" with "".
+             * //*/
+            thisUser.Answers += "" + "Purchase_" + filename + ";";//Purchase indicates that the item is not yet payed for.
+            //Filename_of_Solution_to_Purchase = "";
+            //Filename_of_Solution_to_Purchase = filename;// +";";
 
             model.CorrectAnswer = "Error 3";
             IQueryable<Question> retrieved2 = from theAnswers in db.Questions
@@ -248,7 +325,8 @@ namespace AnswerApp.Controllers
             return RedirectToAction("ViewAnswer/purchase", "Answers", model);
         }
 
-        //INCOMPLETE
+        //Allows the user to upload new Answers along with their respective
+        //Practice Problem and the answer to that Practice Problem
         public ActionResult Upload(UploadModel model, string returnUrl)
         {
             List<ViewDataUploadFilesResult> r = new List<ViewDataUploadFilesResult>();
@@ -274,91 +352,73 @@ namespace AnswerApp.Controllers
 
                 AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
                     
-                //if (hpf != null)
+                //Disect the file name for it's file properties
+                String[] properties = FileName.Split(new char[1] { '_' });
+                String Textbook_Title = properties[0];
+                String Unit_Title = properties[1];
+                String Chapter_Title = properties[2];
+                String Section_Title = properties[3];
+                String Page_Number = properties[4];
+                String Question_Number = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                String Practice_Problem = null;
+                if (properties.Length > 6) { Practice_Problem = properties[6]; }//An 7th argument indicates a Practice Problem
+                if (Practice_Problem != null) { Practice_Problem = properties[6].Split(new char[1] { '.' })[0]; }//Truncate ".pdf" from the end of the file name
+
+                //Search teh database for this Question
+                IQueryable<Question> retrieved = from theAnswers in db.Questions
+                                                    where theAnswers.Textbook_Title.Equals(Textbook_Title)
+                                                    && theAnswers.Unit_Title.Equals(Unit_Title)
+                                                    && theAnswers.Chapter_Title.Equals(Chapter_Title)
+                                                    && theAnswers.Section_Title.Equals(Section_Title)
+                                                    && theAnswers.Page_Number.Equals(Page_Number)
+                                                    && theAnswers.Question_Number.Equals(Question_Number)
+                                                    select theAnswers;
+                Question[] results = retrieved.ToArray<Question>();
+                if (results.Length != 0)//The Answer already exists
                 {
-                    //AnswerApp.Models.Question theQuestion = db.Questions.Single<Question>(d => d.Question_Id == 2);
-                    
-                    //Disect the file name for it's file properties
-                    String[] properties = FileName.Split(new char[1] { '_' });
-                    String Textbook_Title = properties[0];
-                    String Unit_Title = properties[1];
-                    String Chapter_Title = properties[2];
-                    String Section_Title = properties[3];
-                    String Page_Number = properties[4];
-                    String Question_Number = properties[5].Split(new char[1] { '.' })[0];
-                    String Practice_Problem = null;
-                    //Practice_Problem = properties[7];
-                    if (properties.Length > 6) { Practice_Problem = properties[6]; }
-                    if (Practice_Problem != null) { Practice_Problem = properties[6].Split(new char[1] { '.' })[0]; }
+                    //Use the existing Question
+                    AnswerApp.Models.Question theQuestion = results.First();
 
-                    IQueryable<Question> retrieved = from theAnswers in db.Questions
-                                                     where theAnswers.Textbook_Title.Equals(Textbook_Title)
-                                                     && theAnswers.Unit_Title.Equals(Unit_Title)
-                                                     && theAnswers.Chapter_Title.Equals(Chapter_Title)
-                                                     && theAnswers.Section_Title.Equals(Section_Title)
-                                                     && theAnswers.Page_Number.Equals(Page_Number)
-                                                     && theAnswers.Question_Number.Equals(Question_Number)
-                                                     select theAnswers;
-                    Question[] results = retrieved.ToArray<Question>();
-                    if (results.Length != 0)//The Answer already exists
+                    if (Practice_Problem != null)//This is a Practice Problem
                     {
-                        //Use the existing Question
-                        AnswerApp.Models.Question theQuestion = results.First();
-
-                        if (Practice_Problem != null)//This is a Practice Problem
-                        {
-                            theQuestion.Practice_Problem = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
-                            theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
-                        }
-                        else//(Practice_Problem == null) This is an Answer
-                        {
-                            theQuestion.Answer = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
-                            theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
-                        }
+                        theQuestion.Practice_Problem = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
+                        theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
                     }
-                    else//(results.Length == 0) This is a new Answer
+                    else//(Practice_Problem == null) This is an Answer
                     {
-                        //Create a new Question
-                        AnswerApp.Models.Question theQuestion = new AnswerApp.Models.Question();
-
-                        //Populate the Question with the properties extracted from the file name
-                        theQuestion.Textbook_Title = Textbook_Title;
-                        theQuestion.Unit_Title = Unit_Title;
-                        theQuestion.Chapter_Title = Chapter_Title;
-                        theQuestion.Section_Title = Section_Title;
-                        theQuestion.Page_Number = Page_Number;
-                        theQuestion.Question_Number = Question_Number;
-
-                        //db.Questions.InsertOnSubmit(theQuestion);
-                        //db.SubmitChanges();
-                        //AnswerApp.Models.Question retrieved = db.Questions.Single<Question>(d => d.Question_Id == theQuestion.Question_Id);
-                        //theQuestion = retrieved;
-
-                        if (Practice_Problem != null)//This is a Practice Problem
-                        {
-                            theQuestion.Practice_Problem = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
-                            theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
-                        }
-                        else//(Practice_Problem == null) This is an Answer
-                        {
-                            theQuestion.Answer = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
-                            theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
-                        }
-
-                        //Insert the new Question into the database
-                        db.Questions.InsertOnSubmit(theQuestion);
-
-                        //ViewData["Test"] = Practice_Problem;
+                        theQuestion.Answer = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
+                        theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
                     }
                 }
+                else//(results.Length == 0) This is a new Answer
+                {
+                    //Create a new Question
+                    AnswerApp.Models.Question theQuestion = new AnswerApp.Models.Question();
 
+                    //Populate the Question with the properties extracted from the file name
+                    theQuestion.Textbook_Title = Textbook_Title;
+                    theQuestion.Unit_Title = Unit_Title;
+                    theQuestion.Chapter_Title = Chapter_Title;
+                    theQuestion.Section_Title = Section_Title;
+                    theQuestion.Page_Number = Page_Number;
+                    theQuestion.Question_Number = Question_Number;
+
+                    if (Practice_Problem != null)//This is a Practice Problem
+                    {
+                        theQuestion.Practice_Problem = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
+                        theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
+                    }
+                    else//(Practice_Problem == null) This is an Answer
+                    {
+                        theQuestion.Answer = new BinaryReader(hpf.InputStream).ReadBytes((int)hpf.InputStream.Length);
+                        theQuestion.Practice_Problem_Answer = model.PracticeProblemAnswer;
+                    }
+
+                    //Insert the new Question into the database
+                    db.Questions.InsertOnSubmit(theQuestion);
+                }
                 db.SubmitChanges();//Commit the changes to the database.
-                
             }
-            //Question retrieved = db.Questions.Single(d => d.Question_Id == theQuestion.Question_Id);
-            //ViewBag.RetrievedAnswer = theQuestion.ToString();// retrieved.ToString();
-            //ViewBag.RetrievedAnswer = theQuestion.Question_Id;// retrieved.Question_Id;
-
             return View("Upload", r);
         }
 
@@ -367,8 +427,7 @@ namespace AnswerApp.Controllers
         //As a file on the server file system.  
         public ActionResult GetPdf(String argument)
         {
-
-            //String[] arguments = new String[8];
+            //Extract the file properties from the file name argument
             String[] arguments = argument.Split(new char[1] { '_' });
             String user = arguments[0];
             String Textbook_Title = arguments[1];
@@ -378,13 +437,15 @@ namespace AnswerApp.Controllers
             String Page_Number = arguments[5];
             String Question_Number = arguments[6].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
             String Practice_Problem = null;
-            if (arguments.Length == 8){Practice_Problem = arguments[7];}
-            if (Practice_Problem != null){Practice_Problem = arguments[7].Split(new char[1] { '.' })[0];}
+            if (arguments.Length > 7){Practice_Problem = arguments[7];}//An 8th argument indicates a Practice Problem
+            if (Practice_Problem != null) { Practice_Problem = arguments[7].Split(new char[1] { '.' })[0]; }//Truncate ".pdf" from the end of the file name
 
+            //If the username is not the one specified in the file name, redirect them
             if (!User.Identity.Name.Equals(user)) { return RedirectToAction("LogOn", "Account"); }
 
             String filename = argument;//The name of the file will be prefixed by the username of the person retrieving it
 
+            //Generate the file name under which the answer will be stored in the database
             String FileNameInDB = "" + arguments[1] +
                                   "_" + arguments[2] +
                                   "_" + arguments[3] +
@@ -394,23 +455,23 @@ namespace AnswerApp.Controllers
 
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
             
-            AnswerApp.Models.Question theQuestion = new AnswerApp.Models.Question();
-
+            //Check to see that the user is registered
             AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
             
-            if (thisUser == null) { RedirectToAction("LogOn", "Account"); }
+            //If the user is not in the database they will be redirected to the registration page
+            if (thisUser == null) { RedirectToAction("Register", "Account"); }
 
             //If the user has previous answers then check them to see if this is one of them
             if (thisUser.Answers != null)
             {
-                string[] UserAnswers = new string[100];
-                UserAnswers = thisUser.Answers.Split(new char[2] { ',', ';' });
+                String[] UserAnswers = thisUser.Answers.Split(new char[2] { ',', ';' });
 
-                //Check to see if the user already has that answer (This will only be necesary for when a user uses the back button to reach the purchase page again.
-                for (int index = 0; index < UserAnswers.Length; index++)
+                //Check to see if the user already has that answer
+                for (int index = 0; index < UserAnswers.Length; index++)//For each answer in the user's answers
                 {
-                    if (UserAnswers[index].Equals(FileNameInDB))
+                    if (UserAnswers[index].Equals(FileNameInDB))//If this answer is the answer we're looking for
                     {
+                        //Retrieve the answer from the database
                         IQueryable<Question> retrieved = from theAnswers in db.Questions
                                                          where theAnswers.Textbook_Title.Equals(Textbook_Title)
                                                          && theAnswers.Unit_Title.Equals(Unit_Title)
@@ -420,22 +481,66 @@ namespace AnswerApp.Controllers
                                                          && theAnswers.Question_Number.Equals(Question_Number)
                                                          select theAnswers;
                         Question[] results = retrieved.ToArray<Question>();
-                        if (results.Length == 0) { return RedirectToAction("ResourceUnavailable", "Home"); }
-                        theQuestion = results.First();
+                        if (results.Length == 0) { return RedirectToAction("ResourceUnavailable", "Home"); }//If the answer doesn't exist in the database then redirect them
+                        AnswerApp.Models.Question theQuestion = results.First();
                         byte[] pdfBytes = null;
-                        if (Practice_Problem != null)//.Equals("Practice Problem"))
+                        if (Practice_Problem != null)//This is a Practice Problem
                         {
                             pdfBytes = theQuestion.Practice_Problem.ToArray();
                         }
-                        else
+                        else//(Practice_Problem == null) This is not a Practice Problem
                         {
                             pdfBytes = theQuestion.Answer.ToArray(); 
                         }
                         return new PdfResult(pdfBytes, false, filename);
-                    }
+                    }//else this answer is not the answer we're loking for so continue searching
                 }
             }
-            return RedirectToAction("Pay", "Answers");
+            //After checking all of the users answers, if this Answer is not listed, redirect to select page
+            return RedirectToAction("Select", "Answers");
+        }
+
+        public ActionResult PayPal(String argument)
+        {
+            AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+            AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
+            if (thisUser == null) { return RedirectToAction("LogOn", "Account"); }
+
+            String thisUsersAnswers = thisUser.Answers.Replace("Purchase_", "*");// += Filename_of_Solution_to_Purchase +";";
+
+            //db.SubmitChanges();
+
+            String[] Solution_Just_Purchased = thisUsersAnswers.Split(new char[1] { '*' });
+            String[] Local_Filename_of_Solution_to_Purchase = Solution_Just_Purchased[1].Split(new char[1] { ';' });
+
+            thisUser.Answers = thisUser.Answers.Replace("Purchase_", "");
+
+            db.SubmitChanges();
+            /*String Local_Filename_of_Solution_to_Purchase = null;
+            Local_Filename_of_Solution_to_Purchase = String.Copy(Filename_of_Solution_to_Purchase);
+            Filename_of_Solution_to_Purchase = null;//*/
+
+            //Disect the file name for it's file properties
+            String[] properties = Local_Filename_of_Solution_to_Purchase[0].Split(new char[1] { '_' });
+            String Textbook_Title = properties[0];
+            String Unit_Title = properties[1];
+            String Chapter_Title = properties[2];
+            String Section_Title = properties[3];
+            String Page_Number = properties[4];
+            String Question_Number = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+            String Practice_Problem = null;
+            if (properties.Length > 6) { Practice_Problem = properties[6]; }//An 7th argument indicates a Practice Problem
+            if (Practice_Problem != null) { Practice_Problem = properties[6].Split(new char[1] { '.' })[0]; }//Truncate ".pdf" from the end of the file name//*/
+
+            AnswerApp.Models.SelectModel model = new AnswerApp.Models.SelectModel();
+            model.Textbook = Textbook_Title;
+            model.Unit = Unit_Title;
+            model.Chapter = Chapter_Title;
+            model.Section = Section_Title;
+            model.Page = Page_Number;
+            model.Question = Question_Number;
+
+            return RedirectToAction("ViewAnswer/" + User.Identity.Name, "Answers", model);
         }
     }
 }

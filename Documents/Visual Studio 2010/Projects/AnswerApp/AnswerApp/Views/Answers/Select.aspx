@@ -5,24 +5,21 @@
 </asp:Content>
 
 <asp:Content ID="SelectContent" ContentPlaceHolderID="MainContent" runat="server">
-    <form id="form1" runat="server">
+
+
     <h2><%: Model.Textbook %></h2>
+            
+    <form id="form1" runat="server">
+
+    <asp:ScriptManager ID="asm" runat="server" />
         <%if (Request.IsAuthenticated){%>
         <% using (Html.BeginForm()) { %>
             <div>
                 <fieldset>
                     <legend>Selection a Question</legend>
                     <table>
-                        <!--tr>
-                            <td>
-                                <label for="Textbook">Textbook:</label>
-                            </td>
-                            <td-->
-                                <%//= Html.DropDownList("Textbook", ViewBag.TextbookDropDownList as SelectList)%>
-                                <%= Html.Hidden("Textbook", Model.Textbook) %>
-                                <%= Html.Hidden("PracticeProblemAnswer", Model.PracticeProblemAnswer)%>
-                            <!--/td>
-                        </tr-->
+                            <%= Html.Hidden("Textbook", Model.Textbook) %>
+                            <%= Html.Hidden("PracticeProblemAnswer", Model.PracticeProblemAnswer)%>
                         <tr>
                             <td>
                                 <label for="Unit">Unit:</label>
@@ -67,6 +64,29 @@
                 <input type="submit" value="Select" />
                 </fieldset>
             </div>
+
+            <div> 
+                Vendor: <asp:DropDownList ID="VendorsList" runat="server"/><br /> 
+                Contacts: <asp:DropDownList ID="ContactsList" runat="server"/><br /> 
+            </div>
+
+            <ajaxToolkit:CascadingDropDown ID="ccd1" 
+                runat="server" 
+                ServicePath="~/SelectionWebService.asmx" 
+                ServiceMethod="GetUnits" 
+                TargetControlID="VendorsList" 
+                Category="<%=Model.Textbook %>" 
+                PromptText="Select Unit" />
+
+            <ajaxToolkit:CascadingDropDown ID="ccd2" 
+                runat="server" 
+                ServicePath="~/SelectionWebService.asmx" 
+                ServiceMethod="GetChapters" 
+                TargetControlID="ContactsList" 
+                ParentControlID="VendorsList" 
+                Category="Chapter" 
+                PromptText="Select Chapter" />
+
         <% } %>
     <% } %>
     </form>

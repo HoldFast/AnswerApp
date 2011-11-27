@@ -14,6 +14,15 @@ namespace AnswerApp.Controllers
 {
     public class HomeController : Controller
     {
+
+        // data GET service
+        public JsonResult getUser(int id)
+        {
+            AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+            User user = db.Users.Single(u => u.Unique_Id == 4);
+            return Json(user, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult Index(HomeModel model)
         {
             if (Request.IsAuthenticated)

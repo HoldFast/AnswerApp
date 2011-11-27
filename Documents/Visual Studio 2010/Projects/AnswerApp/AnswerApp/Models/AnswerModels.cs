@@ -20,21 +20,6 @@ namespace AnswerApp.Models
 
     public class SelectModel
     {
-        [DisplayName("First Name")]
-        public string FirstName { get; set; }
-
-        [DisplayName("Last Name")]
-        public string LastName { get; set; }
-
-        [DisplayName("Phone Number")]
-        public string PhoneNumber { get; set; }
-
-        [DisplayName("Date of Birth (\"yyyy-mm-dd\")")]
-        public string DateOfBirth { get; set; }
-
-        [DisplayName("Health Care Number")]
-        public string HealthCareNumber { get; set; }
-
         [DisplayName("Textbook")]
         public string Textbook { get; set; }
 
@@ -58,18 +43,6 @@ namespace AnswerApp.Models
 
         [DisplayName("CorrectAnswer")]
         public string CorrectAnswer { get; set; }
-
-        /*[DisplayName("PracticeProblemAnswerA")]
-        public string PracticeProblemAnswerA { get; set; }
-
-        [DisplayName("PracticeProblemAnswerB")]
-        public string PracticeProblemAnswerB { get; set; }
-
-        [DisplayName("PracticeProblemAnswerC")]
-        public string PracticeProblemAnswerC { get; set; }
-
-        [DisplayName("PracticeProblemAnswerD")]
-        public string PracticeProblemAnswerD { get; set; }//*/
     }
 
     public class UploadModel

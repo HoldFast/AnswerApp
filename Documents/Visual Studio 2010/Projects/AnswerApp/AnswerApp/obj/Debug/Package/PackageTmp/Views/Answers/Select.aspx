@@ -5,8 +5,13 @@
 </asp:Content>
 
 <asp:Content ID="SelectContent" ContentPlaceHolderID="MainContent" runat="server">
-    <form id="form1" runat="server">
+
+
     <h2><%: Model.Textbook %></h2>
+            
+    <form id="form1" runat="server">
+
+    <asp:ScriptManager ID="asm" runat="server" />
         <%if (Request.IsAuthenticated){%>
         <% using (Html.BeginForm()) { %>
             <div>
@@ -67,6 +72,16 @@
                 <input type="submit" value="Select" />
                 </fieldset>
             </div>
+
+            <div> 
+                Vendor: <asp:DropDownList ID="VendorsList" runat="server"/><br /> 
+                Contacts: <asp:DropDownList ID="ContactsList" runat="server"/><br /> 
+            </div>
+
+            <ajaxToolkit:CascadingDropDown ID="ccd1" runat="server" ServicePath="~/SelectionWebService.asmx" ServiceMethod="GetVendors" TargetControlID="VendorsList" Category="Vendor" PromptText="Select Vendor" />
+
+            <ajaxToolkit:CascadingDropDown ID="ccd2" runat="server" ServicePath="~/SelectionWebService.asmx" ServiceMethod="GetContactsForVendor" TargetControlID="ContactsList" ParentControlID="VendorsList" Category="Contact" PromptText="Select Contact" />
+
         <% } %>
     <% } %>
     </form>
