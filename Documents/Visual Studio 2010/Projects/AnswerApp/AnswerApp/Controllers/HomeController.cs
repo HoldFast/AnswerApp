@@ -65,6 +65,42 @@ namespace AnswerApp.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult Index(HomeModel model, string returnUrl)
+        {
+            //Extract the known catagory values from the user's meta data
+            AnswerApp.Models.AnswerAppDataContext db = new AnswerAppDataContext();
+            AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
+            String knownCategoryValues = thisUser.MetaData;
+            
+            //Convert to proper format
+            knownCategoryValues = knownCategoryValues.Replace("Textbook:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Unit:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Chapter:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Section:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Page:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Question:", "");
+            
+            //Disect the file name for it's file properties
+            String[] properties = knownCategoryValues.Split(new char[1] { ';' });
+            String Textbook_Title = properties[0];
+            String Unit_Title = properties[1];
+            String Chapter_Title = properties[2];
+            String Section_Title = properties[3];
+            String Page_Number = properties[4];
+            String Question_Number = properties[5];//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+
+            AnswerApp.Models.SelectModel theSelectModel = new SelectModel();
+            theSelectModel.Textbook = Textbook_Title;
+            theSelectModel.Unit = Unit_Title;
+            theSelectModel.Chapter = Chapter_Title;
+            theSelectModel.Section = Section_Title;
+            theSelectModel.Page = Page_Number;
+            theSelectModel.Question = Question_Number;
+
+            return RedirectToAction("ViewAnswer/" + User.Identity.Name, "Answers", theSelectModel);
+        }
+
         public ActionResult ResourceUnavailable(HomeModel model)
         {
             return View();

@@ -1,5 +1,37 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<AnswerApp.Models.SelectModel>" %>
+﻿<%@ Page Title="Select" EnableEventValidation="false" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<AnswerApp.Models.SelectModel>" %>
 
+<script runat="server">
+
+    protected void QuestionsList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        
+        // Get selected values
+        string Unit = UnitsList.SelectedItem.Text;
+        string Chapter = ChaptersList.SelectedItem.Text;
+        string Section = SectionsList.SelectedItem.Text;
+        string Page = PagesList.SelectedItem.Text;
+        string Question = QuestionsList.SelectedItem.Text;
+
+        // Output result string based on which values are specified
+        if (string.IsNullOrEmpty(Unit))
+        {
+            Label1.Text = "Please select a unit.";
+        }
+        else if (string.IsNullOrEmpty(Chapter))
+        {
+            Label1.Text = "Please select a chapter.";
+        }
+        else if (string.IsNullOrEmpty(Section))
+        {
+            Label1.Text = "Please select a section.";
+        }
+        else
+        {
+            Label1.Text = string.Format("You have chosen a {0} {1} {2}. Nice car!", Unit, Chapter, Section);
+        }
+        
+    }
+</script>
 <asp:Content ID="SelectTitle" ContentPlaceHolderID="TitleContent" runat="server">
     
 </asp:Content>
@@ -64,29 +96,6 @@
                 <input type="submit" value="Select" />
                 </fieldset>
             </div>
-
-            <div> 
-                Vendor: <asp:DropDownList ID="VendorsList" runat="server"/><br /> 
-                Contacts: <asp:DropDownList ID="ContactsList" runat="server"/><br /> 
-            </div>
-
-            <ajaxToolkit:CascadingDropDown ID="ccd1" 
-                runat="server" 
-                ServicePath="~/SelectionWebService.asmx" 
-                ServiceMethod="GetUnits" 
-                TargetControlID="VendorsList" 
-                Category="<%=Model.Textbook %>" 
-                PromptText="Select Unit" />
-
-            <ajaxToolkit:CascadingDropDown ID="ccd2" 
-                runat="server" 
-                ServicePath="~/SelectionWebService.asmx" 
-                ServiceMethod="GetChapters" 
-                TargetControlID="ContactsList" 
-                ParentControlID="VendorsList" 
-                Category="Chapter" 
-                PromptText="Select Chapter" />
-
         <% } %>
     <% } %>
     </form>

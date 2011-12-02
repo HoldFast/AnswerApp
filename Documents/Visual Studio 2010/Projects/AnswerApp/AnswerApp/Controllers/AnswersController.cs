@@ -61,9 +61,22 @@ namespace AnswerApp.Controllers
         public ActionResult Select(string argument, SelectModel model)
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            model.Textbook = argument;
+            
+            //Populate List of Units
             List<string> TextbookList = new List<string>();
-            TextbookList.Add(model.Textbook);
+            List<AnswerApp.Models.Textbook> All_Textbooks = new List<AnswerApp.Models.Textbook>();
+            All_Textbooks = db.Textbooks.ToList();
+            foreach (Textbook theTextbook in All_Textbooks)
+            {
+                if (theTextbook.Title == model.Textbook)
+                {
+                    TextbookList.Add(theTextbook.Title);
+                }
+            }
+            
+            model.Textbook = argument;
+            //List<string> TextbookList = new List<string>();
+            //TextbookList.Add(model.Textbook);
 
             //Populate List of Units
             List<string> UnitList = new List<string>();
@@ -138,6 +151,35 @@ namespace AnswerApp.Controllers
         [HttpPost]
         public ActionResult Select(SelectModel model, string returnUrl)
         {
+            //Extract the known catagory values from the user's meta data
+            AnswerApp.Models.AnswerAppDataContext db = new AnswerAppDataContext();
+            AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
+            String knownCategoryValues = thisUser.MetaData;
+            
+            //Convert to proper format
+            knownCategoryValues = knownCategoryValues.Replace("Textbook:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Unit:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Chapter:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Section:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Page:", "");
+            knownCategoryValues = knownCategoryValues.Replace("Question:", "");
+            
+            //Disect the file name for it's file properties
+            String[] properties = knownCategoryValues.Split(new char[1] { ';' });
+            String Textbook_Title = properties[0];
+            String Unit_Title = properties[1];
+            String Chapter_Title = properties[2];
+            String Section_Title = properties[3];
+            String Page_Number = properties[4];
+            String Question_Number = properties[5];//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+            
+            model.Textbook = Textbook_Title;
+            model.Unit = Unit_Title;
+            model.Chapter = Chapter_Title;
+            model.Section = Section_Title;
+            model.Page = Page_Number;
+            model.Question = Question_Number;
+            
             return RedirectToAction("ViewAnswer/" + User.Identity.Name, "Answers", model);
         }
 
@@ -364,6 +406,124 @@ namespace AnswerApp.Controllers
                 if (properties.Length > 6) { Practice_Problem = properties[6]; }//An 7th argument indicates a Practice Problem
                 if (Practice_Problem != null) { Practice_Problem = properties[6].Split(new char[1] { '.' })[0]; }//Truncate ".pdf" from the end of the file name
 
+                //Search teh database for this Textbook
+                IQueryable<Textbook> RetrievedTextbooks = from theTextbooks in db.Textbooks
+                                                          where theTextbooks.Title.Equals(Textbook_Title)
+                                                          select theTextbooks;
+                Textbook[] TextbookResults = RetrievedTextbooks.ToArray<Textbook>();
+                if (TextbookResults.Length == 0)//The Textbook does not yet exists
+                {
+                    //Create a new Textbook
+                    AnswerApp.Models.Textbook theTextbook = new AnswerApp.Models.Textbook();
+
+                    //Populate the Textbook with the properties extracted from the file name
+                    theTextbook.Title = Textbook_Title;
+
+                    db.Textbooks.InsertOnSubmit(theTextbook);
+                    db.SubmitChanges();
+                }
+
+                //Search teh database for this Unit
+                IQueryable<Unit> RetrievedUnits = from theUnits in db.Units
+                                                  where theUnits.Textbook_Title.Equals(Textbook_Title)
+                                                  && theUnits.Unit_Title.Equals(Unit_Title)
+                                                  select theUnits;
+                Unit[] UnitResults = RetrievedUnits.ToArray<Unit>();
+                if (UnitResults.Length == 0)//The Unit does not yet exists
+                {
+                    //Create a new Unit
+                    AnswerApp.Models.Unit theUnit = new AnswerApp.Models.Unit();
+
+                    //Populate the Unit with the properties extracted from the file name
+                    theUnit.Textbook_Title = Textbook_Title;
+                    theUnit.Unit_Title = Unit_Title;
+                    //Populate the relational Id's based on previous hierarchical entries
+                    theUnit.Textbook_Id = db.Textbooks.Single(d => d.Title.Equals(Textbook_Title)).Unique_Id;
+
+                    db.Units.InsertOnSubmit(theUnit);
+                    db.SubmitChanges();
+                }
+
+                //Search teh database for this Chapter
+                IQueryable<Chapter> RetrievedChapters = from theChapters in db.Chapters
+                                                        where theChapters.Textbook_Title.Equals(Textbook_Title)
+                                                        && theChapters.Unit_Title.Equals(Unit_Title)
+                                                        && theChapters.Chapter_Title.Equals(Chapter_Title)
+                                                        select theChapters;
+                Chapter[] ChapterResults = RetrievedChapters.ToArray<Chapter>();
+                if (ChapterResults.Length == 0)//The Chapter does not yet exists
+                {
+                    //Create a new Chapter
+                    AnswerApp.Models.Chapter theChapter = new AnswerApp.Models.Chapter();
+
+                    //Populate the Chapter with the properties extracted from the file name
+                    theChapter.Textbook_Title = Textbook_Title;
+                    theChapter.Unit_Title = Unit_Title;
+                    theChapter.Chapter_Title = Chapter_Title;
+                    //Populate the relational Id's based on previous hierarchical entries
+                    theChapter.Textbook_Id = db.Textbooks.Single(d => d.Title.Equals(Textbook_Title)).Unique_Id;
+                    theChapter.Unit_Id = db.Units.Single(d => d.Unit_Title.Equals(Unit_Title)).Unit_Id;
+
+                    db.Chapters.InsertOnSubmit(theChapter);
+                    db.SubmitChanges();
+                }
+
+                //Search teh database for this Section
+                IQueryable<Section> RetrievedSections = from theSections in db.Sections
+                                                        where theSections.Textbook_Title.Equals(Textbook_Title)
+                                                        && theSections.Unit_Title.Equals(Unit_Title)
+                                                        && theSections.Chapter_Title.Equals(Chapter_Title)
+                                                        && theSections.Section_Title.Equals(Section_Title)
+                                                        select theSections;
+                Section[] SectionResults = RetrievedSections.ToArray<Section>();
+                if (SectionResults.Length == 0)//The Section does not yet exists
+                {
+                    //Create a new Section
+                    AnswerApp.Models.Section theSection = new AnswerApp.Models.Section();
+
+                    //Populate the Section with the properties extracted from the file name
+                    theSection.Textbook_Title = Textbook_Title;
+                    theSection.Unit_Title = Unit_Title;
+                    theSection.Chapter_Title = Chapter_Title;
+                    theSection.Section_Title = Section_Title;
+                    //Populate the relational Id's based on previous hierarchical entries
+                    theSection.Textbook_Id = db.Textbooks.Single(d => d.Title.Equals(Textbook_Title)).Unique_Id;
+                    theSection.Unit_Id = db.Units.Single(d => d.Unit_Title.Equals(Unit_Title)).Unit_Id;
+                    theSection.Chapter_Id = db.Chapters.Single(d => d.Chapter_Title.Equals(Chapter_Title)).Chapter_Id;
+
+                    db.Sections.InsertOnSubmit(theSection);
+                    db.SubmitChanges();
+                }
+
+                //Search teh database for this Page
+                IQueryable<Page> RetrievedPages = from thePages in db.Pages
+                                                  where thePages.Textbook_Title.Equals(Textbook_Title)
+                                                  && thePages.Unit_Title.Equals(Unit_Title)
+                                                  && thePages.Chapter_Title.Equals(Chapter_Title)
+                                                  && thePages.Section_Title.Equals(Section_Title)
+                                                  && thePages.Page_Number.Equals(Page_Number)
+                                                  select thePages;
+                Page[] PageResults = RetrievedPages.ToArray<Page>();
+                if (PageResults.Length == 0)//The Page does not yet exists
+                {
+                    //Create a new Page
+                    AnswerApp.Models.Page thePage = new AnswerApp.Models.Page();
+
+                    //Populate the Page with the properties extracted from the file name
+                    thePage.Textbook_Title = Textbook_Title;
+                    thePage.Unit_Title = Unit_Title;
+                    thePage.Chapter_Title = Chapter_Title;
+                    thePage.Section_Title = Section_Title;
+                    thePage.Page_Number = Page_Number;
+                    //Populate the relational Id's based on previous hierarchical entries
+                    thePage.Textbook_Id = db.Textbooks.Single(d => d.Title.Equals(Textbook_Title)).Unique_Id;
+                    thePage.Unit_Id = db.Units.Single(d => d.Unit_Title.Equals(Unit_Title)).Unit_Id;
+                    thePage.Chapter_Id = db.Chapters.Single(d => d.Chapter_Title.Equals(Chapter_Title)).Chapter_Id;
+                    thePage.Section_Id = db.Sections.Single(d => d.Section_Title.Equals(Section_Title)).Section_Id;
+
+                    db.Pages.InsertOnSubmit(thePage);
+                }
+
                 //Search teh database for this Question
                 IQueryable<Question> retrieved = from theAnswers in db.Questions
                                                     where theAnswers.Textbook_Title.Equals(Textbook_Title)
@@ -402,6 +562,12 @@ namespace AnswerApp.Controllers
                     theQuestion.Section_Title = Section_Title;
                     theQuestion.Page_Number = Page_Number;
                     theQuestion.Question_Number = Question_Number;
+                    //Populate the relational Id's based on previous hierarchical entries
+                    theQuestion.Textbook_Id = db.Textbooks.Single(d => d.Title.Equals(Textbook_Title)).Unique_Id;
+                    theQuestion.Unit_Id = db.Units.Single(d => d.Unit_Title.Equals(Unit_Title)).Unit_Id;
+                    theQuestion.Chapter_Id = db.Chapters.Single(d => d.Chapter_Title.Equals(Chapter_Title)).Chapter_Id;
+                    theQuestion.Section_Id = db.Sections.Single(d => d.Section_Title.Equals(Section_Title)).Section_Id;
+                    theQuestion.Page_Id = db.Pages.Single(d => d.Page_Number.Equals(Page_Number)).Page_Id;
 
                     if (Practice_Problem != null)//This is a Practice Problem
                     {
@@ -417,6 +583,7 @@ namespace AnswerApp.Controllers
                     //Insert the new Question into the database
                     db.Questions.InsertOnSubmit(theQuestion);
                 }
+
                 db.SubmitChanges();//Commit the changes to the database.
             }
             return View("Upload", r);
@@ -506,6 +673,7 @@ namespace AnswerApp.Controllers
             AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
             if (thisUser == null) { return RedirectToAction("LogOn", "Account"); }
 
+
             String thisUsersAnswers = thisUser.Answers.Replace("Purchase_", "*");// += Filename_of_Solution_to_Purchase +";";
 
             //db.SubmitChanges();
@@ -541,6 +709,11 @@ namespace AnswerApp.Controllers
             model.Question = Question_Number;
 
             return RedirectToAction("ViewAnswer/" + User.Identity.Name, "Answers", model);
+        }
+
+        protected void QuestionsList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            RedirectToAction("Index", "Home");
         }
     }
 }

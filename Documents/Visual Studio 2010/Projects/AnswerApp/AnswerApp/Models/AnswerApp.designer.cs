@@ -45,6 +45,9 @@ namespace AnswerApp.Models
     partial void InsertPage(Page instance);
     partial void UpdatePage(Page instance);
     partial void DeletePage(Page instance);
+    partial void InsertQuestion(Question instance);
+    partial void UpdateQuestion(Question instance);
+    partial void DeleteQuestion(Question instance);
     partial void InsertScience_10(Science_10 instance);
     partial void UpdateScience_10(Science_10 instance);
     partial void DeleteScience_10(Science_10 instance);
@@ -57,9 +60,6 @@ namespace AnswerApp.Models
     partial void InsertUnit(Unit instance);
     partial void UpdateUnit(Unit instance);
     partial void DeleteUnit(Unit instance);
-    partial void InsertQuestion(Question instance);
-    partial void UpdateQuestion(Question instance);
-    partial void DeleteQuestion(Question instance);
     #endregion
 		
 		public AnswerAppDataContext() : 
@@ -140,6 +140,14 @@ namespace AnswerApp.Models
 			}
 		}
 		
+		public System.Data.Linq.Table<Question> Questions
+		{
+			get
+			{
+				return this.GetTable<Question>();
+			}
+		}
+		
 		public System.Data.Linq.Table<Science_10> Science_10s
 		{
 			get
@@ -169,14 +177,6 @@ namespace AnswerApp.Models
 			get
 			{
 				return this.GetTable<Unit>();
-			}
-		}
-		
-		public System.Data.Linq.Table<Question> Questions
-		{
-			get
-			{
-				return this.GetTable<Question>();
 			}
 		}
 	}
@@ -386,6 +386,8 @@ namespace AnswerApp.Models
 		
 		private string _Answers;
 		
+		private string _MetaData;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -400,6 +402,8 @@ namespace AnswerApp.Models
     partial void OnPasswordChanged();
     partial void OnAnswersChanging(string value);
     partial void OnAnswersChanged();
+    partial void OnMetaDataChanging(string value);
+    partial void OnMetaDataChanged();
     #endregion
 		
 		public User()
@@ -503,6 +507,26 @@ namespace AnswerApp.Models
 					this._Answers = value;
 					this.SendPropertyChanged("Answers");
 					this.OnAnswersChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MetaData", DbType="NVarChar(MAX)")]
+		public string MetaData
+		{
+			get
+			{
+				return this._MetaData;
+			}
+			set
+			{
+				if ((this._MetaData != value))
+				{
+					this.OnMetaDataChanging(value);
+					this.SendPropertyChanging();
+					this._MetaData = value;
+					this.SendPropertyChanged("MetaData");
+					this.OnMetaDataChanged();
 				}
 			}
 		}
@@ -1090,7 +1114,7 @@ namespace AnswerApp.Models
 		
 		private System.Nullable<int> _Chapter_Id;
 		
-		private string _Chapter_TItle;
+		private string _Chapter_Title;
 		
 		private System.Nullable<int> _Unit_Id;
 		
@@ -1114,8 +1138,8 @@ namespace AnswerApp.Models
     partial void OnSection_TitleChanged();
     partial void OnChapter_IdChanging(System.Nullable<int> value);
     partial void OnChapter_IdChanged();
-    partial void OnChapter_TItleChanging(string value);
-    partial void OnChapter_TItleChanged();
+    partial void OnChapter_TitleChanging(string value);
+    partial void OnChapter_TitleChanged();
     partial void OnUnit_IdChanging(System.Nullable<int> value);
     partial void OnUnit_IdChanged();
     partial void OnUnit_TitleChanging(string value);
@@ -1231,22 +1255,22 @@ namespace AnswerApp.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Chapter_TItle", DbType="NVarChar(MAX)")]
-		public string Chapter_TItle
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Chapter_Title", DbType="NVarChar(MAX)")]
+		public string Chapter_Title
 		{
 			get
 			{
-				return this._Chapter_TItle;
+				return this._Chapter_Title;
 			}
 			set
 			{
-				if ((this._Chapter_TItle != value))
+				if ((this._Chapter_Title != value))
 				{
-					this.OnChapter_TItleChanging(value);
+					this.OnChapter_TitleChanging(value);
 					this.SendPropertyChanging();
-					this._Chapter_TItle = value;
-					this.SendPropertyChanged("Chapter_TItle");
-					this.OnChapter_TItleChanged();
+					this._Chapter_Title = value;
+					this.SendPropertyChanged("Chapter_Title");
+					this.OnChapter_TitleChanged();
 				}
 			}
 		}
@@ -1327,6 +1351,404 @@ namespace AnswerApp.Models
 					this._Textbook_Title = value;
 					this.SendPropertyChanged("Textbook_Title");
 					this.OnTextbook_TitleChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Question")]
+	public partial class Question : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Question_Id;
+		
+		private string _Question_Number;
+		
+		private System.Nullable<int> _Page_Id;
+		
+		private string _Page_Number;
+		
+		private System.Nullable<int> _Section_Id;
+		
+		private string _Section_Title;
+		
+		private System.Nullable<int> _Chapter_Id;
+		
+		private string _Chapter_Title;
+		
+		private System.Nullable<int> _Unit_Id;
+		
+		private string _Unit_Title;
+		
+		private System.Nullable<int> _Textbook_Id;
+		
+		private string _Textbook_Title;
+		
+		private System.Data.Linq.Binary _Answer;
+		
+		private System.Data.Linq.Binary _Practice_Problem;
+		
+		private string _Practice_Problem_Answer;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnQuestion_IdChanging(int value);
+    partial void OnQuestion_IdChanged();
+    partial void OnQuestion_NumberChanging(string value);
+    partial void OnQuestion_NumberChanged();
+    partial void OnPage_IdChanging(System.Nullable<int> value);
+    partial void OnPage_IdChanged();
+    partial void OnPage_NumberChanging(string value);
+    partial void OnPage_NumberChanged();
+    partial void OnSection_IdChanging(System.Nullable<int> value);
+    partial void OnSection_IdChanged();
+    partial void OnSection_TitleChanging(string value);
+    partial void OnSection_TitleChanged();
+    partial void OnChapter_IdChanging(System.Nullable<int> value);
+    partial void OnChapter_IdChanged();
+    partial void OnChapter_TitleChanging(string value);
+    partial void OnChapter_TitleChanged();
+    partial void OnUnit_IdChanging(System.Nullable<int> value);
+    partial void OnUnit_IdChanged();
+    partial void OnUnit_TitleChanging(string value);
+    partial void OnUnit_TitleChanged();
+    partial void OnTextbook_IdChanging(System.Nullable<int> value);
+    partial void OnTextbook_IdChanged();
+    partial void OnTextbook_TitleChanging(string value);
+    partial void OnTextbook_TitleChanged();
+    partial void OnAnswerChanging(System.Data.Linq.Binary value);
+    partial void OnAnswerChanged();
+    partial void OnPractice_ProblemChanging(System.Data.Linq.Binary value);
+    partial void OnPractice_ProblemChanged();
+    partial void OnPractice_Problem_AnswerChanging(string value);
+    partial void OnPractice_Problem_AnswerChanged();
+    #endregion
+		
+		public Question()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Question_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Question_Id
+		{
+			get
+			{
+				return this._Question_Id;
+			}
+			set
+			{
+				if ((this._Question_Id != value))
+				{
+					this.OnQuestion_IdChanging(value);
+					this.SendPropertyChanging();
+					this._Question_Id = value;
+					this.SendPropertyChanged("Question_Id");
+					this.OnQuestion_IdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Question_Number", DbType="NVarChar(MAX)")]
+		public string Question_Number
+		{
+			get
+			{
+				return this._Question_Number;
+			}
+			set
+			{
+				if ((this._Question_Number != value))
+				{
+					this.OnQuestion_NumberChanging(value);
+					this.SendPropertyChanging();
+					this._Question_Number = value;
+					this.SendPropertyChanged("Question_Number");
+					this.OnQuestion_NumberChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Page_Id", DbType="Int")]
+		public System.Nullable<int> Page_Id
+		{
+			get
+			{
+				return this._Page_Id;
+			}
+			set
+			{
+				if ((this._Page_Id != value))
+				{
+					this.OnPage_IdChanging(value);
+					this.SendPropertyChanging();
+					this._Page_Id = value;
+					this.SendPropertyChanged("Page_Id");
+					this.OnPage_IdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Page_Number", DbType="NVarChar(MAX)")]
+		public string Page_Number
+		{
+			get
+			{
+				return this._Page_Number;
+			}
+			set
+			{
+				if ((this._Page_Number != value))
+				{
+					this.OnPage_NumberChanging(value);
+					this.SendPropertyChanging();
+					this._Page_Number = value;
+					this.SendPropertyChanged("Page_Number");
+					this.OnPage_NumberChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Section_Id", DbType="Int")]
+		public System.Nullable<int> Section_Id
+		{
+			get
+			{
+				return this._Section_Id;
+			}
+			set
+			{
+				if ((this._Section_Id != value))
+				{
+					this.OnSection_IdChanging(value);
+					this.SendPropertyChanging();
+					this._Section_Id = value;
+					this.SendPropertyChanged("Section_Id");
+					this.OnSection_IdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Section_Title", DbType="NVarChar(MAX)")]
+		public string Section_Title
+		{
+			get
+			{
+				return this._Section_Title;
+			}
+			set
+			{
+				if ((this._Section_Title != value))
+				{
+					this.OnSection_TitleChanging(value);
+					this.SendPropertyChanging();
+					this._Section_Title = value;
+					this.SendPropertyChanged("Section_Title");
+					this.OnSection_TitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Chapter_Id", DbType="Int")]
+		public System.Nullable<int> Chapter_Id
+		{
+			get
+			{
+				return this._Chapter_Id;
+			}
+			set
+			{
+				if ((this._Chapter_Id != value))
+				{
+					this.OnChapter_IdChanging(value);
+					this.SendPropertyChanging();
+					this._Chapter_Id = value;
+					this.SendPropertyChanged("Chapter_Id");
+					this.OnChapter_IdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Chapter_Title", DbType="NVarChar(MAX)")]
+		public string Chapter_Title
+		{
+			get
+			{
+				return this._Chapter_Title;
+			}
+			set
+			{
+				if ((this._Chapter_Title != value))
+				{
+					this.OnChapter_TitleChanging(value);
+					this.SendPropertyChanging();
+					this._Chapter_Title = value;
+					this.SendPropertyChanged("Chapter_Title");
+					this.OnChapter_TitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Unit_Id", DbType="Int")]
+		public System.Nullable<int> Unit_Id
+		{
+			get
+			{
+				return this._Unit_Id;
+			}
+			set
+			{
+				if ((this._Unit_Id != value))
+				{
+					this.OnUnit_IdChanging(value);
+					this.SendPropertyChanging();
+					this._Unit_Id = value;
+					this.SendPropertyChanged("Unit_Id");
+					this.OnUnit_IdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Unit_Title", DbType="NVarChar(MAX)")]
+		public string Unit_Title
+		{
+			get
+			{
+				return this._Unit_Title;
+			}
+			set
+			{
+				if ((this._Unit_Title != value))
+				{
+					this.OnUnit_TitleChanging(value);
+					this.SendPropertyChanging();
+					this._Unit_Title = value;
+					this.SendPropertyChanged("Unit_Title");
+					this.OnUnit_TitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Textbook_Id", DbType="Int")]
+		public System.Nullable<int> Textbook_Id
+		{
+			get
+			{
+				return this._Textbook_Id;
+			}
+			set
+			{
+				if ((this._Textbook_Id != value))
+				{
+					this.OnTextbook_IdChanging(value);
+					this.SendPropertyChanging();
+					this._Textbook_Id = value;
+					this.SendPropertyChanged("Textbook_Id");
+					this.OnTextbook_IdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Textbook_Title", DbType="NVarChar(MAX)")]
+		public string Textbook_Title
+		{
+			get
+			{
+				return this._Textbook_Title;
+			}
+			set
+			{
+				if ((this._Textbook_Title != value))
+				{
+					this.OnTextbook_TitleChanging(value);
+					this.SendPropertyChanging();
+					this._Textbook_Title = value;
+					this.SendPropertyChanged("Textbook_Title");
+					this.OnTextbook_TitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Answer", DbType="VarBinary(MAX)", UpdateCheck=UpdateCheck.Never)]
+		public System.Data.Linq.Binary Answer
+		{
+			get
+			{
+				return this._Answer;
+			}
+			set
+			{
+				if ((this._Answer != value))
+				{
+					this.OnAnswerChanging(value);
+					this.SendPropertyChanging();
+					this._Answer = value;
+					this.SendPropertyChanged("Answer");
+					this.OnAnswerChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Practice_Problem", DbType="VarBinary(MAX)", UpdateCheck=UpdateCheck.Never)]
+		public System.Data.Linq.Binary Practice_Problem
+		{
+			get
+			{
+				return this._Practice_Problem;
+			}
+			set
+			{
+				if ((this._Practice_Problem != value))
+				{
+					this.OnPractice_ProblemChanging(value);
+					this.SendPropertyChanging();
+					this._Practice_Problem = value;
+					this.SendPropertyChanged("Practice_Problem");
+					this.OnPractice_ProblemChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Practice_Problem_Answer", DbType="NVarChar(50)")]
+		public string Practice_Problem_Answer
+		{
+			get
+			{
+				return this._Practice_Problem_Answer;
+			}
+			set
+			{
+				if ((this._Practice_Problem_Answer != value))
+				{
+					this.OnPractice_Problem_AnswerChanging(value);
+					this.SendPropertyChanging();
+					this._Practice_Problem_Answer = value;
+					this.SendPropertyChanged("Practice_Problem_Answer");
+					this.OnPractice_Problem_AnswerChanged();
 				}
 			}
 		}
@@ -2151,404 +2573,6 @@ namespace AnswerApp.Models
 					this._Textbook_Title = value;
 					this.SendPropertyChanged("Textbook_Title");
 					this.OnTextbook_TitleChanged();
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Question")]
-	public partial class Question : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _Question_Id;
-		
-		private string _Question_Number;
-		
-		private System.Nullable<int> _Page_Id;
-		
-		private string _Page_Number;
-		
-		private System.Nullable<int> _Section_Id;
-		
-		private string _Section_Title;
-		
-		private System.Nullable<int> _Chapter_Id;
-		
-		private string _Chapter_Title;
-		
-		private System.Nullable<int> _Unit_Id;
-		
-		private string _Unit_Title;
-		
-		private System.Nullable<int> _Textbook_Id;
-		
-		private string _Textbook_Title;
-		
-		private System.Data.Linq.Binary _Answer;
-		
-		private System.Data.Linq.Binary _Practice_Problem;
-		
-		private string _Practice_Problem_Answer;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnQuestion_IdChanging(int value);
-    partial void OnQuestion_IdChanged();
-    partial void OnQuestion_NumberChanging(string value);
-    partial void OnQuestion_NumberChanged();
-    partial void OnPage_IdChanging(System.Nullable<int> value);
-    partial void OnPage_IdChanged();
-    partial void OnPage_NumberChanging(string value);
-    partial void OnPage_NumberChanged();
-    partial void OnSection_IdChanging(System.Nullable<int> value);
-    partial void OnSection_IdChanged();
-    partial void OnSection_TitleChanging(string value);
-    partial void OnSection_TitleChanged();
-    partial void OnChapter_IdChanging(System.Nullable<int> value);
-    partial void OnChapter_IdChanged();
-    partial void OnChapter_TitleChanging(string value);
-    partial void OnChapter_TitleChanged();
-    partial void OnUnit_IdChanging(System.Nullable<int> value);
-    partial void OnUnit_IdChanged();
-    partial void OnUnit_TitleChanging(string value);
-    partial void OnUnit_TitleChanged();
-    partial void OnTextbook_IdChanging(System.Nullable<int> value);
-    partial void OnTextbook_IdChanged();
-    partial void OnTextbook_TitleChanging(string value);
-    partial void OnTextbook_TitleChanged();
-    partial void OnAnswerChanging(System.Data.Linq.Binary value);
-    partial void OnAnswerChanged();
-    partial void OnPractice_ProblemChanging(System.Data.Linq.Binary value);
-    partial void OnPractice_ProblemChanged();
-    partial void OnPractice_Problem_AnswerChanging(string value);
-    partial void OnPractice_Problem_AnswerChanged();
-    #endregion
-		
-		public Question()
-		{
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Question_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int Question_Id
-		{
-			get
-			{
-				return this._Question_Id;
-			}
-			set
-			{
-				if ((this._Question_Id != value))
-				{
-					this.OnQuestion_IdChanging(value);
-					this.SendPropertyChanging();
-					this._Question_Id = value;
-					this.SendPropertyChanged("Question_Id");
-					this.OnQuestion_IdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Question_Number", DbType="NVarChar(MAX)")]
-		public string Question_Number
-		{
-			get
-			{
-				return this._Question_Number;
-			}
-			set
-			{
-				if ((this._Question_Number != value))
-				{
-					this.OnQuestion_NumberChanging(value);
-					this.SendPropertyChanging();
-					this._Question_Number = value;
-					this.SendPropertyChanged("Question_Number");
-					this.OnQuestion_NumberChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Page_Id", DbType="Int")]
-		public System.Nullable<int> Page_Id
-		{
-			get
-			{
-				return this._Page_Id;
-			}
-			set
-			{
-				if ((this._Page_Id != value))
-				{
-					this.OnPage_IdChanging(value);
-					this.SendPropertyChanging();
-					this._Page_Id = value;
-					this.SendPropertyChanged("Page_Id");
-					this.OnPage_IdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Page_Number", DbType="NVarChar(MAX)")]
-		public string Page_Number
-		{
-			get
-			{
-				return this._Page_Number;
-			}
-			set
-			{
-				if ((this._Page_Number != value))
-				{
-					this.OnPage_NumberChanging(value);
-					this.SendPropertyChanging();
-					this._Page_Number = value;
-					this.SendPropertyChanged("Page_Number");
-					this.OnPage_NumberChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Section_Id", DbType="Int")]
-		public System.Nullable<int> Section_Id
-		{
-			get
-			{
-				return this._Section_Id;
-			}
-			set
-			{
-				if ((this._Section_Id != value))
-				{
-					this.OnSection_IdChanging(value);
-					this.SendPropertyChanging();
-					this._Section_Id = value;
-					this.SendPropertyChanged("Section_Id");
-					this.OnSection_IdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Section_Title", DbType="NVarChar(MAX)")]
-		public string Section_Title
-		{
-			get
-			{
-				return this._Section_Title;
-			}
-			set
-			{
-				if ((this._Section_Title != value))
-				{
-					this.OnSection_TitleChanging(value);
-					this.SendPropertyChanging();
-					this._Section_Title = value;
-					this.SendPropertyChanged("Section_Title");
-					this.OnSection_TitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Chapter_Id", DbType="Int")]
-		public System.Nullable<int> Chapter_Id
-		{
-			get
-			{
-				return this._Chapter_Id;
-			}
-			set
-			{
-				if ((this._Chapter_Id != value))
-				{
-					this.OnChapter_IdChanging(value);
-					this.SendPropertyChanging();
-					this._Chapter_Id = value;
-					this.SendPropertyChanged("Chapter_Id");
-					this.OnChapter_IdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Chapter_Title", DbType="NVarChar(MAX)")]
-		public string Chapter_Title
-		{
-			get
-			{
-				return this._Chapter_Title;
-			}
-			set
-			{
-				if ((this._Chapter_Title != value))
-				{
-					this.OnChapter_TitleChanging(value);
-					this.SendPropertyChanging();
-					this._Chapter_Title = value;
-					this.SendPropertyChanged("Chapter_Title");
-					this.OnChapter_TitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Unit_Id", DbType="Int")]
-		public System.Nullable<int> Unit_Id
-		{
-			get
-			{
-				return this._Unit_Id;
-			}
-			set
-			{
-				if ((this._Unit_Id != value))
-				{
-					this.OnUnit_IdChanging(value);
-					this.SendPropertyChanging();
-					this._Unit_Id = value;
-					this.SendPropertyChanged("Unit_Id");
-					this.OnUnit_IdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Unit_Title", DbType="NVarChar(MAX)")]
-		public string Unit_Title
-		{
-			get
-			{
-				return this._Unit_Title;
-			}
-			set
-			{
-				if ((this._Unit_Title != value))
-				{
-					this.OnUnit_TitleChanging(value);
-					this.SendPropertyChanging();
-					this._Unit_Title = value;
-					this.SendPropertyChanged("Unit_Title");
-					this.OnUnit_TitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Textbook_Id", DbType="Int")]
-		public System.Nullable<int> Textbook_Id
-		{
-			get
-			{
-				return this._Textbook_Id;
-			}
-			set
-			{
-				if ((this._Textbook_Id != value))
-				{
-					this.OnTextbook_IdChanging(value);
-					this.SendPropertyChanging();
-					this._Textbook_Id = value;
-					this.SendPropertyChanged("Textbook_Id");
-					this.OnTextbook_IdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Textbook_Title", DbType="NVarChar(MAX)")]
-		public string Textbook_Title
-		{
-			get
-			{
-				return this._Textbook_Title;
-			}
-			set
-			{
-				if ((this._Textbook_Title != value))
-				{
-					this.OnTextbook_TitleChanging(value);
-					this.SendPropertyChanging();
-					this._Textbook_Title = value;
-					this.SendPropertyChanged("Textbook_Title");
-					this.OnTextbook_TitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Answer", DbType="VarBinary(MAX)", UpdateCheck=UpdateCheck.Never)]
-		public System.Data.Linq.Binary Answer
-		{
-			get
-			{
-				return this._Answer;
-			}
-			set
-			{
-				if ((this._Answer != value))
-				{
-					this.OnAnswerChanging(value);
-					this.SendPropertyChanging();
-					this._Answer = value;
-					this.SendPropertyChanged("Answer");
-					this.OnAnswerChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Practice_Problem", DbType="VarBinary(MAX)", UpdateCheck=UpdateCheck.Never)]
-		public System.Data.Linq.Binary Practice_Problem
-		{
-			get
-			{
-				return this._Practice_Problem;
-			}
-			set
-			{
-				if ((this._Practice_Problem != value))
-				{
-					this.OnPractice_ProblemChanging(value);
-					this.SendPropertyChanging();
-					this._Practice_Problem = value;
-					this.SendPropertyChanged("Practice_Problem");
-					this.OnPractice_ProblemChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Practice_Problem_Answer", DbType="NVarChar(50)")]
-		public string Practice_Problem_Answer
-		{
-			get
-			{
-				return this._Practice_Problem_Answer;
-			}
-			set
-			{
-				if ((this._Practice_Problem_Answer != value))
-				{
-					this.OnPractice_Problem_AnswerChanging(value);
-					this.SendPropertyChanging();
-					this._Practice_Problem_Answer = value;
-					this.SendPropertyChanged("Practice_Problem_Answer");
-					this.OnPractice_Problem_AnswerChanged();
 				}
 			}
 		}

@@ -21,6 +21,7 @@
       <Column Name="Email" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="Password" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="Answers" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="MetaData" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.Book" Member="Books">
@@ -60,11 +61,30 @@
       <Column Name="Section_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="Section_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="Chapter_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Chapter_TItle" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Chapter_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="Unit_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="Unit_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="Textbook_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="Textbook_Title" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Question" Member="Questions">
+    <Type Name="Question">
+      <Column Name="Question_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Question_Number" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Page_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Page_Number" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Section_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Section_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Chapter_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Chapter_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Unit_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Unit_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Textbook_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Textbook_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Answer" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Practice_Problem" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Practice_Problem_Answer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.[Science 10]" Member="Science_10s">
@@ -109,25 +129,6 @@
       <Column Name="Unit_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="Textbook_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="Textbook_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Question" Member="Questions">
-    <Type Name="Question">
-      <Column Name="Question_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Question_Number" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="Page_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Page_Number" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="Section_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Section_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="Chapter_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Chapter_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="Unit_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Unit_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="Textbook_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Textbook_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="Answer" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX)" CanBeNull="true" UpdateCheck="Never" />
-      <Column Name="Practice_Problem" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX)" CanBeNull="true" UpdateCheck="Never" />
-      <Column Name="Practice_Problem_Answer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
     </Type>
   </Table>
 </Database>
