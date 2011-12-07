@@ -246,7 +246,9 @@ nav,
     margin-top: 40px;
 }
 
-div#title {
+div#title 
+{
+    border-width: 0px;
     display: block;
     float: left;
     text-align: left;

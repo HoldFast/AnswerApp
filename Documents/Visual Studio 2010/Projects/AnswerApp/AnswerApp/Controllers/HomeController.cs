@@ -9,7 +9,6 @@ using System.Data.Linq;
 using AnswerApp.Models;
 
 
-
 namespace AnswerApp.Controllers
 {
     public class HomeController : Controller
@@ -35,9 +34,19 @@ namespace AnswerApp.Controllers
 
                 AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
 
-                if (thisUser == null) { RedirectToAction("LogOn", "Account"); }//This should never happen
-                else
-                {
+                if (thisUser == null) { return RedirectToAction("LogOn", "Account"); }//This should never happen
+                
+                
+
+
+
+
+
+                
+                
+                //else
+                //{
+
                     //Calculate the percentages of each textbook the user has purchased
                     /*List<String> UserTextbooks = new List<String>(); ;
                     List<String> UserAnswers = thisUser.Answers.Split(new char[1] { ';' }).ToList();
@@ -55,7 +64,7 @@ namespace AnswerApp.Controllers
                         }
                         
                     }//*/
-                }
+                //}
 
                 return View(model);
             }
@@ -83,13 +92,19 @@ namespace AnswerApp.Controllers
             
             //Disect the file name for it's file properties
             String[] properties = knownCategoryValues.Split(new char[1] { ';' });
-            String Textbook_Title = properties[0];
-            String Unit_Title = properties[1];
-            String Chapter_Title = properties[2];
-            String Section_Title = properties[3];
-            String Page_Number = properties[4];
-            String Question_Number = properties[5];//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
-
+            String Textbook_Title = null;
+            String Unit_Title = null;
+            String Chapter_Title = null;
+            String Section_Title = null;
+            String Page_Number = null;
+            String Question_Number = null;
+            if (properties.Length > 0) { Textbook_Title = properties[0]; }
+            if (properties.Length > 1) { Unit_Title = properties[1]; }
+            if (properties.Length > 2) { Chapter_Title = properties[2]; }
+            if (properties.Length > 3) { Section_Title = properties[3]; }
+            if (properties.Length > 4) { Page_Number = properties[4]; }
+            if (properties.Length > 5) { Question_Number = properties[5]; }//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+            
             AnswerApp.Models.SelectModel theSelectModel = new SelectModel();
             theSelectModel.Textbook = Textbook_Title;
             theSelectModel.Unit = Unit_Title;

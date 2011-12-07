@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="8ae5f058-884c-4fe8-9c61-17098b79707b" name="Aaron Patten@AARONPATTEN 2011-12-06 14:03:27" runUser="AaronPatten\Aaron Patten" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Default Test Settings" id="7742fc79-61fa-4ba4-b399-e3b1522c3d0d">
+    <Deployment runDeploymentRoot="Aaron Patten_AARONPATTEN 2011-12-06 14_03_27">
+      <DeploymentItem filename="C:\Users\Aaron Patten\Documents\Visual Studio 2010\Projects\AnswerApp\AnswerApp\bin\AnswerApp.dll" />
+    </Deployment>
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2011-12-06T14:03:27.8557965-08:00" queuing="2011-12-06T14:03:35.2382188-08:00" start="2011-12-06T14:03:35.4092285-08:00" finish="2011-12-06T14:04:14.0724400-08:00" />
+  <ResultSummary outcome="Error">
+    <Counters total="2" executed="2" passed="1" error="0" failed="0" timeout="0" aborted="1" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <RunInfos>
+      <RunInfo computerName="AARONPATTEN" outcome="Error" timestamp="2011-12-06T14:04:14.0714399-08:00">
+        <Text>Test host process exited unexpectedly.</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="Pay" storage="c:\users\aaron patten\documents\visual studio 2010\projects\answerapp\answerapp.tests\bin\debug\answerapp.tests.dll" id="5fcc867c-d2d4-066a-4adf-f55f88817b6e">
+      <Execution id="dbab050f-3e5a-4d65-afee-9e84b6e25c44" />
+      <TestMethod codeBase="C:/Users/Aaron Patten/Documents/Visual Studio 2010/Projects/AnswerApp/AnswerApp.Tests/bin/Debug/AnswerApp.Tests.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="AnswerApp.Tests.Controllers.HomeControllerTest, AnswerApp.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="Pay" />
+    </UnitTest>
+    <UnitTest name="Index" storage="c:\users\aaron patten\documents\visual studio 2010\projects\answerapp\answerapp.tests\bin\debug\answerapp.tests.dll" id="b5f9bca1-3c5a-6707-1f18-8874c5d9a42e">
+      <Execution id="2795a6a2-d2c6-488d-a119-020d4b937312" />
+      <TestMethod codeBase="C:/Users/Aaron Patten/Documents/Visual Studio 2010/Projects/AnswerApp/AnswerApp.Tests/bin/Debug/AnswerApp.Tests.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="AnswerApp.Tests.Controllers.HomeControllerTest, AnswerApp.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="Index" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="5fcc867c-d2d4-066a-4adf-f55f88817b6e" executionId="dbab050f-3e5a-4d65-afee-9e84b6e25c44" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b5f9bca1-3c5a-6707-1f18-8874c5d9a42e" executionId="2795a6a2-d2c6-488d-a119-020d4b937312" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="dbab050f-3e5a-4d65-afee-9e84b6e25c44" testId="5fcc867c-d2d4-066a-4adf-f55f88817b6e" testName="Pay" computerName="AARONPATTEN" duration="00:00:00.5661884" startTime="2011-12-06T14:03:35.5232351-08:00" endTime="2011-12-06T14:03:38.2193893-08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dbab050f-3e5a-4d65-afee-9e84b6e25c44">
+    </UnitTestResult>
+    <UnitTestResult executionId="2795a6a2-d2c6-488d-a119-020d4b937312" testId="b5f9bca1-3c5a-6707-1f18-8874c5d9a42e" testName="Index" computerName="AARONPATTEN" duration="00:00:35.7660458" startTime="2011-12-06T14:03:38.3063942-08:00" endTime="2011-12-06T14:04:14.0724400-08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Aborted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2795a6a2-d2c6-488d-a119-020d4b937312">
+    </UnitTestResult>
+  </Results>
+</TestRun>

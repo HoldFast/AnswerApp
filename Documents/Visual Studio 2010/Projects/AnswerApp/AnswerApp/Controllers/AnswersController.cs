@@ -166,12 +166,18 @@ namespace AnswerApp.Controllers
             
             //Disect the file name for it's file properties
             String[] properties = knownCategoryValues.Split(new char[1] { ';' });
-            String Textbook_Title = properties[0];
-            String Unit_Title = properties[1];
-            String Chapter_Title = properties[2];
-            String Section_Title = properties[3];
-            String Page_Number = properties[4];
-            String Question_Number = properties[5];//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+            String Textbook_Title = null;
+            String Unit_Title = null;
+            String Chapter_Title = null;
+            String Section_Title = null;
+            String Page_Number = null;
+            String Question_Number = null;
+            if (properties.Length > 0) { Textbook_Title = properties[0]; }
+            if (properties.Length > 1) { Unit_Title = properties[1]; }
+            if (properties.Length > 2) { Chapter_Title = properties[2]; }
+            if (properties.Length > 3) { Section_Title = properties[3]; }
+            if (properties.Length > 4) { Page_Number = properties[4]; }
+            if (properties.Length > 5) { Question_Number = properties[5]; }//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
             
             model.Textbook = Textbook_Title;
             model.Unit = Unit_Title;
