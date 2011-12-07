@@ -104,7 +104,24 @@ namespace AnswerApp.Controllers
             if (properties.Length > 3) { Section_Title = properties[3]; }
             if (properties.Length > 4) { Page_Number = properties[4]; }
             if (properties.Length > 5) { Question_Number = properties[5]; }//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
-            
+
+            if (!Question_Number.Equals("All") && Page_Number.Equals("All"))
+            {
+                Page_Number = db.Questions.Single<Question>(q => q.Question_Number.Equals(Question_Number)).Page_Number;
+            }
+            if (!Page_Number.Equals("All") && Section_Title.Equals("All"))
+            {
+                Section_Title = db.Pages.Single<Page>(p => p.Page_Number.Equals(Page_Number)).Section_Title;
+            }
+            if (!Section_Title.Equals("All") && Chapter_Title.Equals("All"))
+            {
+                Chapter_Title = db.Sections.Single<Section>(s => s.Section_Title.Equals(Section_Title)).Chapter_Title;
+            }
+            if (!Chapter_Title.Equals("All") && Unit_Title.Equals("All"))
+            {
+                Unit_Title = db.Chapters.Single<Chapter>(s => s.Chapter_Title.Equals(Chapter_Title)).Unit_Title;
+            }
+
             AnswerApp.Models.SelectModel theSelectModel = new SelectModel();
             theSelectModel.Textbook = Textbook_Title;
             theSelectModel.Unit = Unit_Title;

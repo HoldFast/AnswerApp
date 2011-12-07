@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<AnswerApp.Models.SelectModel>" %>
 
 <asp:Content ID="aboutTitle" ContentPlaceHolderID="TitleContent" runat="server">
-    Pay Us
+    New Solution
 </asp:Content>
 
 <asp:Content ID="aboutContent" ContentPlaceHolderID="MainContent" runat="server">

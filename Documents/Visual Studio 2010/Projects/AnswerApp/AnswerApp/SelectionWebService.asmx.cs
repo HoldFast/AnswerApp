@@ -164,14 +164,12 @@ namespace AnswerApp
         public CascadingDropDownNameValue[] GetSections(string knownCategoryValues, string category)
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            //AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
-            //thisUser.MetaData = knownCategoryValues;
-            //db.SubmitChanges();
             
             StringDictionary knownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(knownCategoryValues);
             DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
             knownCatagories.CopyTo(CatagoryArray, 0);
 
+            Boolean Filtered = false;
             IQueryable<AnswerApp.Models.Section> retrieved = null;
             foreach (DictionaryEntry theEntry in CatagoryArray)
             {
@@ -199,6 +197,7 @@ namespace AnswerApp
                         retrieved = from theAnswers in db.Sections
                                     where theAnswers.Unit_Title.Equals(SelectedUnit)
                                     select theAnswers;
+                        Filtered = true;
                     }
                 }
             }
@@ -209,8 +208,11 @@ namespace AnswerApp
                     String SelectedChapter = theEntry.Value.ToString();
                     if (SelectedChapter.Equals("All"))
                     {
-                        retrieved = from theAnswers in db.Sections
-                                    select theAnswers;
+                        if (Filtered == false)
+                        {
+                            retrieved = from theAnswers in db.Sections
+                                        select theAnswers;
+                        }
                     }
                     else
                     {
@@ -244,6 +246,7 @@ namespace AnswerApp
             DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
             knownCatagories.CopyTo(CatagoryArray, 0);
 
+            Boolean Filtered = false;
             IQueryable<AnswerApp.Models.Page> retrieved = null;
             foreach (DictionaryEntry theEntry in CatagoryArray)
             {
@@ -270,6 +273,7 @@ namespace AnswerApp
                         retrieved = from theAnswers in db.Pages
                                     where theAnswers.Unit_Title.Equals(SelectedUnit)
                                     select theAnswers;
+                        Filtered = true;
                     }
                 }
             }
@@ -280,8 +284,11 @@ namespace AnswerApp
                     String SelectedChapter = theEntry.Value.ToString();
                     if (SelectedChapter.Equals("All"))
                     {
-                        retrieved = from theAnswers in db.Pages
-                                    select theAnswers;
+                        if (Filtered == false)
+                        {
+                            retrieved = from theAnswers in db.Pages
+                                        select theAnswers;
+                        }
                     }
                     else
                     {
@@ -298,8 +305,14 @@ namespace AnswerApp
                     String SelectedSection = theEntry.Value.ToString();
                     if (SelectedSection.Equals("All"))
                     {
-                        retrieved = from theAnswers in db.Pages
-                                    select theAnswers;
+                        if (Filtered == false)
+                        {
+                            if (Filtered == false)
+                            {
+                                retrieved = from theAnswers in db.Pages
+                                            select theAnswers;
+                            }
+                        }
                     }
                     else
                     {
@@ -333,6 +346,7 @@ namespace AnswerApp
             DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
             knownCatagories.CopyTo(CatagoryArray, 0);
 
+            Boolean Filtered = false;
             IQueryable<AnswerApp.Models.Question> retrieved = null;
             foreach (DictionaryEntry theEntry in CatagoryArray)
             {
@@ -351,14 +365,15 @@ namespace AnswerApp
                     String SelectedUnit = theEntry.Value.ToString();
                     if (SelectedUnit.Equals("All"))
                     {
-                        retrieved = from theAnswers in db.Questions
-                                    select theAnswers;
+                            retrieved = from theAnswers in db.Questions
+                                        select theAnswers;
                     }
                     else
                     {
                         retrieved = from theAnswers in db.Questions
                                     where theAnswers.Unit_Title.Equals(SelectedUnit)
                                     select theAnswers;
+                        Filtered = true;
                     }
                 }
             } 
@@ -369,14 +384,18 @@ namespace AnswerApp
                     String SelectedChapter = theEntry.Value.ToString();
                     if (SelectedChapter.Equals("All"))
                     {
-                        retrieved = from theAnswers in db.Questions
-                                    select theAnswers;
+                        if (Filtered == false)
+                        {
+                            retrieved = from theAnswers in db.Questions
+                                        select theAnswers;
+                        }
                     }
                     else
                     {
                         retrieved = from theAnswers in db.Questions
                                     where theAnswers.Chapter_Title.Equals(SelectedChapter)
                                     select theAnswers;
+                        Filtered = true;
                     }
                 }
             }
@@ -387,14 +406,18 @@ namespace AnswerApp
                     String SelectedSection = theEntry.Value.ToString();
                     if (SelectedSection.Equals("All"))
                     {
-                        retrieved = from theAnswers in db.Questions
-                                    select theAnswers;
+                        if (Filtered == false)
+                        {
+                            retrieved = from theAnswers in db.Questions
+                                        select theAnswers;
+                        }
                     }
                     else
                     {
                         retrieved = from theAnswers in db.Questions
                                     where theAnswers.Section_Title.Equals(SelectedSection)
                                     select theAnswers;
+                        Filtered = true;
                     }
                 }
             }
@@ -405,14 +428,18 @@ namespace AnswerApp
                     String SelectedPage = theEntry.Value.ToString();
                     if (SelectedPage.Equals("All"))
                     {
-                        retrieved = from theAnswers in db.Questions
-                                    select theAnswers;
+                        if (Filtered == false)
+                        {
+                            retrieved = from theAnswers in db.Questions
+                                        select theAnswers;
+                        }
                     }
                     else
                     {
                         retrieved = from theAnswers in db.Questions
                                     where theAnswers.Page_Number.Equals(SelectedPage)
                                     select theAnswers;
+                        Filtered = true;
                     }
                 }
             }
@@ -433,22 +460,6 @@ namespace AnswerApp
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
 
-            /*StringDictionary knownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(knownCategoryValues);
-            DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
-            knownCatagories.CopyTo(CatagoryArray, 0);
-            String SelectedQuestion = "Error: No question selected";
-            foreach (DictionaryEntry theEntry in CatagoryArray)
-            {
-                if (theEntry.Key.ToString().Equals("question"))
-                {
-                    SelectedQuestion = theEntry.Value.ToString();
-                }
-            }
-            if (SelectedQuestion.Equals("All"))
-            {
-                return null;
-            }//*/
-
             AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
             thisUser.MetaData = knownCategoryValues;
             db.SubmitChanges();
@@ -456,8 +467,9 @@ namespace AnswerApp
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
             
             theList.Add(new CascadingDropDownNameValue(thisUser.UserName, thisUser.UserName));
-            //theList.Add(new CascadingDropDownNameValue(knownCategoryValues, knownCategoryValues));
             return theList.ToArray();
         }
     }
 }
+
+//End
