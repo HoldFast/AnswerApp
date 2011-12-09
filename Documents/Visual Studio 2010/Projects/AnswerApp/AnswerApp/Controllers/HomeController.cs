@@ -105,6 +105,7 @@ namespace AnswerApp.Controllers
             if (properties.Length > 4) { Page_Number = properties[4]; }
             if (properties.Length > 5) { Question_Number = properties[5]; }//.Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
 
+            //Populate parent groupings based on childgroupings
             if (!Question_Number.Equals("All") && Page_Number.Equals("All"))
             {
                 Page_Number = db.Questions.Single<Question>(q => q.Question_Number.Equals(Question_Number)).Page_Number;
@@ -119,7 +120,7 @@ namespace AnswerApp.Controllers
             }
             if (!Chapter_Title.Equals("All") && Unit_Title.Equals("All"))
             {
-                Unit_Title = db.Chapters.Single<Chapter>(s => s.Chapter_Title.Equals(Chapter_Title)).Unit_Title;
+                Unit_Title = db.Chapters.Single<Chapter>(c => c.Chapter_Title.Equals(Chapter_Title)).Unit_Title;
             }
 
             AnswerApp.Models.SelectModel theSelectModel = new SelectModel();

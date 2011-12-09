@@ -9,11 +9,7 @@ using System.Web.Services;
 //Ajax Toolkit
 using System.Web.Script.Services;
 using AjaxControlToolkit;
-//using System;
-//using System.Web;
-//using System.Web.Services;
 using System.Web.Services.Protocols;
-//using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SqlClient;
 
@@ -39,7 +35,7 @@ namespace AnswerApp
     [WebService(Namespace = "http://solvation.ca/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
-    // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
+    // To allow this Web Service to be called from script, using ASP.NET AJAX, use the following line. 
     [System.Web.Script.Services.ScriptService]
 
     public class SelectionWebService : System.Web.Services.WebService
@@ -48,16 +44,11 @@ namespace AnswerApp
         public CascadingDropDownNameValue[] GetTextbooks(string knownCategoryValues, string category)
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            //AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
-            //thisUser.MetaData = knownCategoryValues;
-            //db.SubmitChanges();
             
             IQueryable<AnswerApp.Models.Textbook> retrieved = from theTextbooks in db.Textbooks
                                                               select theTextbooks;
             AnswerApp.Models.Textbook[] results = retrieved.ToArray<AnswerApp.Models.Textbook>();
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
-            //theList.Add(new CascadingDropDownNameValue(knownCategoryValues, knownCategoryValues));
-            //theList.Add(new CascadingDropDownNameValue("All", "All"));
             foreach (AnswerApp.Models.Textbook theTextbook in results)
             {
                 theList.Add(new CascadingDropDownNameValue(theTextbook.Title, theTextbook.Title));
@@ -69,9 +60,6 @@ namespace AnswerApp
         public CascadingDropDownNameValue[] GetUnits(string knownCategoryValues, string category)
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            //AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
-            //thisUser.MetaData = knownCategoryValues;
-            //db.SubmitChanges();
             
             StringDictionary knownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(knownCategoryValues);
             DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
@@ -86,13 +74,11 @@ namespace AnswerApp
                     retrieved = from theAnswers in db.Units
                                 where theAnswers.Textbook_Title.Equals(SelectedTextbook)
                                 select theAnswers;
-                    //break;//
                 }
             }
             
             AnswerApp.Models.Unit[] results = retrieved.ToArray<AnswerApp.Models.Unit>();
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
-            //theList.Add(new CascadingDropDownNameValue(knownCategoryValues, knownCategoryValues));
             theList.Add(new CascadingDropDownNameValue("All", "All"));
             foreach (AnswerApp.Models.Unit theUnit in results)
             {
@@ -105,15 +91,11 @@ namespace AnswerApp
         public CascadingDropDownNameValue[] GetChapters(string knownCategoryValues, string category)
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            //AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
-            //thisUser.MetaData = knownCategoryValues;
-            //never fails priorto this line
-            //db.SubmitChanges();//*/
-            //failedpriorto this line
+
             StringDictionary knownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(knownCategoryValues);
             DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
             knownCatagories.CopyTo(CatagoryArray, 0);
-            //failedpriorto this line
+
             IQueryable<AnswerApp.Models.Chapter> retrieved = null;
             foreach (DictionaryEntry theEntry in CatagoryArray)
             {
@@ -123,7 +105,6 @@ namespace AnswerApp
                     retrieved = from theAnswers in db.Chapters
                                 where theAnswers.Textbook_Title.Equals(SelectedTextbook)
                                 select theAnswers;
-                    //break;//
                 }
             }
             foreach (DictionaryEntry theEntry in CatagoryArray)
@@ -142,21 +123,16 @@ namespace AnswerApp
                                     where theAnswers.Unit_Title.Equals(SelectedUnit)
                                     select theAnswers;
                     }
-                    //break;//
                 }
             }
             
-            
             AnswerApp.Models.Chapter[] results = retrieved.ToArray<AnswerApp.Models.Chapter>();
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
-            //theList.Add(new CascadingDropDownNameValue(knownCategoryValues, knownCategoryValues));
-            //theList.Add(new CascadingDropDownNameValue(category, category));
             theList.Add(new CascadingDropDownNameValue("All", "All"));
             foreach (AnswerApp.Models.Chapter theChapter in results)
             {
                 theList.Add(new CascadingDropDownNameValue(theChapter.Chapter_Title, theChapter.Chapter_Title));
             }
-            //if (theList.Count == 0) { return null; }
             return theList.ToArray();
         }
 
@@ -179,7 +155,6 @@ namespace AnswerApp
                     retrieved = from theAnswers in db.Sections
                                 where theAnswers.Textbook_Title.Equals(SelectedTextbook)
                                 select theAnswers;
-                    //break;//
                 }
             }
             foreach (DictionaryEntry theEntry in CatagoryArray)
@@ -225,7 +200,6 @@ namespace AnswerApp
             
             AnswerApp.Models.Section[] results = retrieved.ToArray<AnswerApp.Models.Section>();
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
-            //theList.Add(new CascadingDropDownNameValue(knownCategoryValues, knownCategoryValues));
             theList.Add(new CascadingDropDownNameValue("All", "All"));
             foreach (AnswerApp.Models.Section theSection in results)
             {
@@ -238,15 +212,13 @@ namespace AnswerApp
         public CascadingDropDownNameValue[] GetPages(string knownCategoryValues, string category)
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            //AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
-            //thisUser.MetaData = knownCategoryValues;
-            //db.SubmitChanges();
             
             StringDictionary knownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(knownCategoryValues);
             DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
             knownCatagories.CopyTo(CatagoryArray, 0);
 
             Boolean Filtered = false;
+            String trace = "";
             IQueryable<AnswerApp.Models.Page> retrieved = null;
             foreach (DictionaryEntry theEntry in CatagoryArray)
             {
@@ -256,6 +228,7 @@ namespace AnswerApp
                     retrieved = from theAnswers in db.Pages
                                 where theAnswers.Textbook_Title.Equals(SelectedTextbook)
                                 select theAnswers;
+                    //trace += "1";//Debug
                 }
             }
             foreach (DictionaryEntry theEntry in CatagoryArray)
@@ -267,6 +240,7 @@ namespace AnswerApp
                     {
                         retrieved = from theAnswers in db.Pages
                                     select theAnswers;
+                        //trace += "2";//Debug
                     }
                     else
                     {
@@ -274,6 +248,7 @@ namespace AnswerApp
                                     where theAnswers.Unit_Title.Equals(SelectedUnit)
                                     select theAnswers;
                         Filtered = true;
+                        //trace += "3";//Debug
                     }
                 }
             }
@@ -288,6 +263,7 @@ namespace AnswerApp
                         {
                             retrieved = from theAnswers in db.Pages
                                         select theAnswers;
+                            //trace += "4";//Debug
                         }
                     }
                     else
@@ -295,6 +271,7 @@ namespace AnswerApp
                         retrieved = from theAnswers in db.Pages
                                     where theAnswers.Chapter_Title.Equals(SelectedChapter)
                                     select theAnswers;
+                        //trace += "5";//Debug
                     }
                 }
             }
@@ -311,6 +288,7 @@ namespace AnswerApp
                             {
                                 retrieved = from theAnswers in db.Pages
                                             select theAnswers;
+                                //trace += "6";//Debug
                             }
                         }
                     }
@@ -319,13 +297,14 @@ namespace AnswerApp
                         retrieved = from theAnswers in db.Pages
                                     where theAnswers.Section_Title.Equals(SelectedSection)
                                     select theAnswers;
+                        //trace += "7";//Debug
                     }
                 }
             }
 
             AnswerApp.Models.Page[] results = retrieved.ToArray<AnswerApp.Models.Page>();
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
-            //theList.Add(new CascadingDropDownNameValue(knownCategoryValues, knownCategoryValues));
+            //theList.Add(new CascadingDropDownNameValue(trace, trace));//Debug
             theList.Add(new CascadingDropDownNameValue("All", "All"));
             foreach (AnswerApp.Models.Page thePage in results)
             {
@@ -338,9 +317,6 @@ namespace AnswerApp
         public CascadingDropDownNameValue[] GetQuestions(string knownCategoryValues, string category)
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            //AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
-            //thisUser.MetaData = knownCategoryValues;
-            //db.SubmitChanges();
             
             StringDictionary knownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(knownCategoryValues);
             DictionaryEntry[] CatagoryArray = new DictionaryEntry[knownCatagories.Count];
@@ -446,7 +422,6 @@ namespace AnswerApp
             
             AnswerApp.Models.Question[] results = retrieved.ToArray<AnswerApp.Models.Question>();
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
-            //theList.Add(new CascadingDropDownNameValue(knownCategoryValues, knownCategoryValues));
             theList.Add(new CascadingDropDownNameValue("All", "All"));
             foreach (AnswerApp.Models.Question theQuestion in results)
             {
@@ -461,12 +436,17 @@ namespace AnswerApp
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
 
             AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
+
+            StringDictionary incomingKnownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(knownCategoryValues);
+
+            if (!incomingKnownCatagories.ContainsKey("question")) { return null; }
             thisUser.MetaData = knownCategoryValues;
-            db.SubmitChanges();
             
             List<CascadingDropDownNameValue> theList = new List<CascadingDropDownNameValue>();
             
             theList.Add(new CascadingDropDownNameValue(thisUser.UserName, thisUser.UserName));
+            
+            db.SubmitChanges();
             return theList.ToArray();
         }
     }

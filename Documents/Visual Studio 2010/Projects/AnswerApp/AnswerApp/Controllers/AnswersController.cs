@@ -54,7 +54,7 @@ namespace AnswerApp.Controllers
 
     public class AnswersController : Controller
     {
-        String Filename_of_Solution_to_Purchase = null;
+        //String Filename_of_Solution_to_Purchase = null;
         //
         // GET: /Answers/
 
@@ -191,6 +191,7 @@ namespace AnswerApp.Controllers
 
         public ActionResult ViewAnswer(string argument, SelectModel model)
         {
+            ViewData["List"] = "Error: No list";
             ViewData["RenderAnswer"] = "false";//don't render practice answer before the user has answered it
 
             ViewData["FileNameExtensionless"] = "" + model.Textbook +
@@ -203,25 +204,30 @@ namespace AnswerApp.Controllers
             ViewData["PracticeProblemFileName"] = "" + ViewData["FileNameExtensionless"] + "_Practice Problem.png";
 
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+
             AnswerApp.Models.User theUser = new AnswerApp.Models.User();
             theUser = db.Users.Single(u => u.UserName.Equals(User.Identity.Name));
             if (theUser != null)
             {
                 if (theUser.Answers != null)
                 {
-                    string[] UserAnswers = new string[100];
-                    UserAnswers = theUser.Answers.Split(new char[2] { ',', ';' });
+                    String[] UserAnswers = theUser.Answers.Split(new char[2] { ',', ';' });
                     
                     for (int i = 0; i < UserAnswers.Length; i++)
                     {
-                        if (UserAnswers[i].Equals(ViewData["FileName"]))
+                        if (UserAnswers[i].Equals(ViewData["FileName"]))//YOU ARE HERE
                         {
+                            if (model.Unit.Equals("All") || model.Chapter.Equals("All") || model.Section.Equals("All") || model.Page.Equals("All") || model.Question.Equals("All"))
+                            {
+                                RedirectToAction("Index", "Home");
+                            }            
                             return View("ViewAnswer", model);
                         }
                     }
                 }
+                return RedirectToAction("Pay", "Answers", model);
             }
-            return RedirectToAction("Pay", "Answers", model);
+            return RedirectToAction("Logon", "Account");
         }
 
         [HttpPost]
@@ -292,8 +298,6 @@ namespace AnswerApp.Controllers
              * Or the easy way is to replace "Purchase_" with "".
              * //*/
             thisUser.Answers += "" + "Purchase_" + filename + ";";//Purchase indicates that the item is not yet payed for.
-            //Filename_of_Solution_to_Purchase = "";
-            //Filename_of_Solution_to_Purchase = filename;// +";";
 
             model.CorrectAnswer = "Error 3";
             IQueryable<Question> retrieved2 = from theAnswers in db.Questions
@@ -328,7 +332,7 @@ namespace AnswerApp.Controllers
                               "_" + model.Section +
                               "_" + model.Page +
                               "_" + model.Question + ".pdf";
-
+    
             /*TO DO
              * Go through all previous purchases and 
              * erase them from the user's List of Answers:
@@ -642,7 +646,7 @@ namespace AnswerApp.Controllers
                 //Check to see if the user already has that answer
                 for (int index = 0; index < UserAnswers.Length; index++)//For each answer in the user's answers
                 {
-                    if (UserAnswers[index].Equals(FileNameInDB))//If this answer is the answer we're looking for
+                    if (UserAnswers[index].Equals(FileNameInDB))//If this answer is the answer we're looking for//YOU ARE HERE
                     {
                         //Retrieve the answer from the database
                         IQueryable<Question> retrieved = from theAnswers in db.Questions
@@ -673,16 +677,13 @@ namespace AnswerApp.Controllers
             return RedirectToAction("Select", "Answers");
         }
 
-        public ActionResult PayPal(String argument)
+        public ActionResult PayPal(String argument)//Chage this name to long string of alphanumerics to prevent access
         {
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
             AnswerApp.Models.User thisUser = db.Users.Single(d => d.UserName.Equals(User.Identity.Name));
             if (thisUser == null) { return RedirectToAction("LogOn", "Account"); }
 
-
             String thisUsersAnswers = thisUser.Answers.Replace("Purchase_", "*");// += Filename_of_Solution_to_Purchase +";";
-
-            //db.SubmitChanges();
 
             String[] Solution_Just_Purchased = thisUsersAnswers.Split(new char[1] { '*' });
             String[] Local_Filename_of_Solution_to_Purchase = Solution_Just_Purchased[1].Split(new char[1] { ';' });
@@ -690,9 +691,6 @@ namespace AnswerApp.Controllers
             thisUser.Answers = thisUser.Answers.Replace("Purchase_", "");
 
             db.SubmitChanges();
-            /*String Local_Filename_of_Solution_to_Purchase = null;
-            Local_Filename_of_Solution_to_Purchase = String.Copy(Filename_of_Solution_to_Purchase);
-            Filename_of_Solution_to_Purchase = null;//*/
 
             //Disect the file name for it's file properties
             String[] properties = Local_Filename_of_Solution_to_Purchase[0].Split(new char[1] { '_' });
@@ -717,9 +715,65 @@ namespace AnswerApp.Controllers
             return RedirectToAction("ViewAnswer/" + User.Identity.Name, "Answers", model);
         }
 
-        protected void QuestionsList_SelectedIndexChanged(object sender, EventArgs e)
+        public Boolean UserHasAccess(String UserName, String FileName)
         {
-            RedirectToAction("Index", "Home");
+            Boolean UserHasAccess = false;
+            AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+
+            AnswerApp.Models.User theUser = new AnswerApp.Models.User();
+            theUser = db.Users.Single(u => u.UserName.Equals(User.Identity.Name));
+
+            //Disect the file name for it's file properties
+            String[] properties = FileName.Split(new char[1] { '_' });
+            AnswerApp.Models.SelectModel model = new AnswerApp.Models.SelectModel();
+            model.Textbook = properties[0];
+            model.Unit = properties[1];
+            model.Chapter = properties[2];
+            model.Section = properties[3];
+            model.Page = properties[4];
+            model.Question = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+
+            if (theUser.Answers != null)
+            {
+                String[] UserAnswers = theUser.Answers.Split(new char[2] { ',', ';' });
+
+                foreach(String thisAnswer in UserAnswers)
+                {
+                    if (thisAnswer.Equals(FileName)) { return true; }//They have purchased this exact selection previously
+                    String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                    AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                    thisModel.Textbook = properties[0];
+                    thisModel.Unit = properties[1];
+                    thisModel.Chapter = properties[2];
+                    thisModel.Section = properties[3];
+                    thisModel.Page = properties[4];
+                    thisModel.Question = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                    if (thisAnswer.Equals(FileName))//YOU ARE HERE
+                    {
+                        if (thisModel.Unit.Equals("All"))
+                        {
+                            return thisModel.Textbook.Equals(model.Textbook);
+                        }
+                        if (thisModel.Chapter.Equals("All"))
+                        {
+                            return thisModel.Unit.Equals(model.Unit);
+                        }
+                        if (thisModel.Section.Equals("All"))
+                        {
+                            return thisModel.Chapter.Equals(model.Chapter);
+                        }
+                        if (thisModel.Page.Equals("All"))
+                        {
+                            return thisModel.Section.Equals(model.Section);
+                        }
+                        if (thisModel.Question.Equals("All"))
+                        {
+                            return thisModel.Page.Equals(model.Page);
+                        }
+                    }
+                }
+            }
+            return UserHasAccess;
         }
     }
 }

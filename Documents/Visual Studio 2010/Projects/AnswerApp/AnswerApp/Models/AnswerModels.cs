@@ -23,9 +23,6 @@ namespace AnswerApp.Models
         [DisplayName("Textbook")]
         public string Textbook { get; set; }
 
-        [DisplayName("MainContent_UnitsList")]
-        public string MainContent_Unit { get; set; }
-
         [DisplayName("Unit")]
         public string Unit { get; set; }
 
