@@ -199,7 +199,7 @@
             ServiceMethod="SetQuestions" 
             TargetControlID="GetQuestions" 
             ParentControlID="QuestionsList" 
-            Category="Final" 
+            Category="Question" 
             PromptValue="1" />
 
         <ajaxToolkit:CascadingDropDown ID="SubmitByPage" 
@@ -208,7 +208,7 @@
             ServiceMethod="SetQuestions" 
             TargetControlID="GetQuestions" 
             ParentControlID="PagesList" 
-            Category="Final" 
+            Category="Page" 
             PromptValue="1" />
 
         <ajaxToolkit:CascadingDropDown ID="SubmitBySection" 
@@ -217,7 +217,7 @@
             ServiceMethod="SetQuestions" 
             TargetControlID="GetQuestions" 
             ParentControlID="SectionsList" 
-            Category="Final" 
+            Category="Section" 
             PromptValue="1" />
 
         <ajaxToolkit:CascadingDropDown ID="SubmitByChapter" 
@@ -226,7 +226,7 @@
             ServiceMethod="SetQuestions" 
             TargetControlID="GetQuestions" 
             ParentControlID="ChaptersList" 
-            Category="Final" 
+            Category="Chapter" 
             PromptValue="1" />
 
         <ajaxToolkit:CascadingDropDown ID="SubmitByUnit" 
@@ -235,7 +235,7 @@
             ServiceMethod="SetQuestions" 
             TargetControlID="GetQuestions" 
             ParentControlID="UnitsList" 
-            Category="Final" 
+            Category="Unit" 
             PromptValue="1" />
 
         <ajaxToolkit:CascadingDropDown ID="SubmitByTextbook" 
@@ -244,7 +244,7 @@
             ServiceMethod="SetQuestions" 
             TargetControlID="GetQuestions" 
             ParentControlID="TextbooksList" 
-            Category="Final" 
+            Category="Textbook" 
             PromptValue="1" />
 
     </form>

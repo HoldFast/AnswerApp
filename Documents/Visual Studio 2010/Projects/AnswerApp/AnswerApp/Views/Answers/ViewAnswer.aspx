@@ -12,7 +12,7 @@
     <%if (Request.IsAuthenticated){%>
     <br /><a href="/Answers/GetPdf/<%="" + Page.User.Identity.Name + "_" + ViewData["FileName"]%>"><%=ViewData["FileName"]%></a> </embed>
     <%}%>
-    <br /><%: Html.ActionLink("Select another answer to view", "Select/" + Model.Textbook, "Answers")%>
+    <br /><%: Html.ActionLink("Select another answer to view", "Index", "Home")%>
 
     <form id="Form1" runat="server">
         <%= Html.Hidden("Textbook", Model.Textbook) %>

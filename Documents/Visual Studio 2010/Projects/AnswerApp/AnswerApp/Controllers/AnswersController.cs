@@ -194,13 +194,15 @@ namespace AnswerApp.Controllers
             ViewData["List"] = "Error: No list";
             ViewData["RenderAnswer"] = "false";//don't render practice answer before the user has answered it
 
-            ViewData["FileNameExtensionless"] = "" + model.Textbook +
-                                                    "_" + model.Unit +
-                                                    "_" + model.Chapter +
-                                                    "_" + model.Section +
-                                                    "_" + model.Page +
-                                                    "_" + model.Question;
-            ViewData["FileName"] = "" + ViewData["FileNameExtensionless"] + ".pdf";
+            String FilenameExtensionless = "" + model.Textbook +
+                              "_" + model.Unit +
+                              "_" + model.Chapter +
+                              "_" + model.Section +
+                              "_" + model.Page +
+                              "_" + model.Question;
+            ViewData["FileNameExtensionless"] = FilenameExtensionless;
+            String FileName = "" + FilenameExtensionless + ".pdf";
+            ViewData["FileName"] = FileName;
             ViewData["PracticeProblemFileName"] = "" + ViewData["FileNameExtensionless"] + "_Practice Problem.png";
 
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
@@ -215,7 +217,7 @@ namespace AnswerApp.Controllers
                     
                     for (int i = 0; i < UserAnswers.Length; i++)
                     {
-                        if (UserAnswers[i].Equals(ViewData["FileName"]))//YOU ARE HERE
+                        if (UserHasAccess(User.Identity.Name, FileName))//(UserAnswers[i].Equals(ViewData["FileName"]))//YOU ARE HERE
                         {
                             if (model.Unit.Equals("All") || model.Chapter.Equals("All") || model.Section.Equals("All") || model.Page.Equals("All") || model.Question.Equals("All"))
                             {
@@ -644,9 +646,9 @@ namespace AnswerApp.Controllers
                 String[] UserAnswers = thisUser.Answers.Split(new char[2] { ',', ';' });
 
                 //Check to see if the user already has that answer
-                for (int index = 0; index < UserAnswers.Length; index++)//For each answer in the user's answers
+                //for (int index = 0; index < UserAnswers.Length; index++)//For each answer in the user's answers
                 {
-                    if (UserAnswers[index].Equals(FileNameInDB))//If this answer is the answer we're looking for//YOU ARE HERE
+                    if (UserHasAccess(User.Identity.Name, FileNameInDB))//If this answer is the answer we're looking for//YOU ARE HERE
                     {
                         //Retrieve the answer from the database
                         IQueryable<Question> retrieved = from theAnswers in db.Questions
@@ -733,43 +735,48 @@ namespace AnswerApp.Controllers
             model.Page = properties[4];
             model.Question = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
 
-            if (theUser.Answers != null)
-            {
-                String[] UserAnswers = theUser.Answers.Split(new char[2] { ',', ';' });
+            if (theUser.Answers == null) { return false; }
+            
+            String[] UserAnswers = theUser.Answers.Split(new char[2] { ',', ';' });
 
-                foreach(String thisAnswer in UserAnswers)
+            foreach(String thisAnswer in UserAnswers)
+            {
+                if (thisAnswer.Equals(FileName)) { return true; }//They have purchased this exact selection previously
+                String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                thisModel.Textbook = properties[0];
+                thisModel.Unit = properties[1];
+                thisModel.Chapter = properties[2];
+                thisModel.Section = properties[3];
+                thisModel.Page = properties[4];
+                thisModel.Question = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                //return thisModel.Textbook.Equals(model.Textbook) &&;
+                
+                //if (thisAnswer.Equals(FileName))//YOU ARE HERE
                 {
-                    if (thisAnswer.Equals(FileName)) { return true; }//They have purchased this exact selection previously
-                    String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
-                    AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
-                    thisModel.Textbook = properties[0];
-                    thisModel.Unit = properties[1];
-                    thisModel.Chapter = properties[2];
-                    thisModel.Section = properties[3];
-                    thisModel.Page = properties[4];
-                    thisModel.Question = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
-                    if (thisAnswer.Equals(FileName))//YOU ARE HERE
+                    if (thisModel.Unit.Equals("All") && thisModel.Textbook.Equals(model.Textbook))
                     {
-                        if (thisModel.Unit.Equals("All"))
-                        {
-                            return thisModel.Textbook.Equals(model.Textbook);
-                        }
-                        if (thisModel.Chapter.Equals("All"))
-                        {
-                            return thisModel.Unit.Equals(model.Unit);
-                        }
-                        if (thisModel.Section.Equals("All"))
-                        {
-                            return thisModel.Chapter.Equals(model.Chapter);
-                        }
-                        if (thisModel.Page.Equals("All"))
-                        {
-                            return thisModel.Section.Equals(model.Section);
-                        }
-                        if (thisModel.Question.Equals("All"))
-                        {
-                            return thisModel.Page.Equals(model.Page);
-                        }
+                        return true;
+                    }
+                    else if (thisModel.Chapter.Equals("All") && thisModel.Unit.Equals(model.Unit))
+                    {
+                        return true;
+                    }
+                    else if (thisModel.Section.Equals("All") && thisModel.Chapter.Equals(model.Chapter))
+                    {
+                        return true;
+                    }
+                    else if (thisModel.Page.Equals("All") && thisModel.Section.Equals(model.Section))
+                    {
+                        return true;
+                    }
+                    else if (thisModel.Question.Equals("All") && thisModel.Page.Equals(model.Page))
+                    {
+                        return true;
+                    }
+                    else if (thisModel.Question.Equals(model.Question))
+                    {
+                        return true;
                     }
                 }
             }
