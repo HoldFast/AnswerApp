@@ -191,7 +191,7 @@ namespace AnswerApp.Controllers
 
         public ActionResult ViewAnswer(string argument, SelectModel model)
         {
-            ViewData["List"] = "Error: No list";
+            ViewData["SelectionList"] = "Error: No list";
             ViewData["RenderAnswer"] = "false";//don't render practice answer before the user has answered it
 
             String FilenameExtensionless = "" + model.Textbook +
@@ -213,18 +213,15 @@ namespace AnswerApp.Controllers
             {
                 if (theUser.Answers != null)
                 {
-                    String[] UserAnswers = theUser.Answers.Split(new char[2] { ',', ';' });
-                    
-                    for (int i = 0; i < UserAnswers.Length; i++)
+                    if (UserHasAccess(User.Identity.Name, FileName))
                     {
-                        if (UserHasAccess(User.Identity.Name, FileName))//(UserAnswers[i].Equals(ViewData["FileName"]))//YOU ARE HERE
+                        if (model.Unit.Equals("All") || model.Chapter.Equals("All") || model.Section.Equals("All") || model.Page.Equals("All") || model.Question.Equals("All"))
                         {
-                            if (model.Unit.Equals("All") || model.Chapter.Equals("All") || model.Section.Equals("All") || model.Page.Equals("All") || model.Question.Equals("All"))
-                            {
-                                RedirectToAction("Index", "Home");
-                            }            
-                            return View("ViewAnswer", model);
+                            RedirectToAction("Index", "Home");
                         }
+                        //YOU ARE HERE
+                        ViewData["SelectionList"] = GenerateSelectionList(model);
+                        return View("ViewAnswer", model);
                     }
                 }
                 return RedirectToAction("Pay", "Answers", model);
@@ -262,6 +259,8 @@ namespace AnswerApp.Controllers
             {
                 model.CorrectAnswer = results.First().Practice_Problem_Answer;
             }
+            //YOU ARE HERE
+            ViewData["SelectionList"] = GenerateSelectionList(model);
             return View("ViewAnswer", model);
         }
 
@@ -357,9 +356,7 @@ namespace AnswerApp.Controllers
              * Or the easy way is to replace "Purchase_" with "".
              * //*/
             thisUser.Answers += "" + "Purchase_" + filename + ";";//Purchase indicates that the item is not yet payed for.
-            //Filename_of_Solution_to_Purchase = "";
-            //Filename_of_Solution_to_Purchase = filename;// +";";
-
+            
             model.CorrectAnswer = "Error 3";
             IQueryable<Question> retrieved2 = from theAnswers in db.Questions
                                               where theAnswers.Textbook_Title.Equals(model.Textbook)
@@ -646,34 +643,31 @@ namespace AnswerApp.Controllers
                 String[] UserAnswers = thisUser.Answers.Split(new char[2] { ',', ';' });
 
                 //Check to see if the user already has that answer
-                //for (int index = 0; index < UserAnswers.Length; index++)//For each answer in the user's answers
+                if (UserHasAccess(User.Identity.Name, FileNameInDB))
                 {
-                    if (UserHasAccess(User.Identity.Name, FileNameInDB))//If this answer is the answer we're looking for//YOU ARE HERE
+                    //Retrieve the answer from the database
+                    IQueryable<Question> retrieved = from theAnswers in db.Questions
+                                                        where theAnswers.Textbook_Title.Equals(Textbook_Title)
+                                                        && theAnswers.Unit_Title.Equals(Unit_Title)
+                                                        && theAnswers.Chapter_Title.Equals(Chapter_Title)
+                                                        && theAnswers.Section_Title.Equals(Section_Title)
+                                                        && theAnswers.Page_Number.Equals(Page_Number)
+                                                        && theAnswers.Question_Number.Equals(Question_Number)
+                                                        select theAnswers;
+                    Question[] results = retrieved.ToArray<Question>();
+                    if (results.Length == 0) { return RedirectToAction("ResourceUnavailable", "Home"); }//If the answer doesn't exist in the database then redirect them
+                    AnswerApp.Models.Question theQuestion = results.First();
+                    byte[] pdfBytes = null;
+                    if (Practice_Problem != null)//This is a Practice Problem
                     {
-                        //Retrieve the answer from the database
-                        IQueryable<Question> retrieved = from theAnswers in db.Questions
-                                                         where theAnswers.Textbook_Title.Equals(Textbook_Title)
-                                                         && theAnswers.Unit_Title.Equals(Unit_Title)
-                                                         && theAnswers.Chapter_Title.Equals(Chapter_Title)
-                                                         && theAnswers.Section_Title.Equals(Section_Title)
-                                                         && theAnswers.Page_Number.Equals(Page_Number)
-                                                         && theAnswers.Question_Number.Equals(Question_Number)
-                                                         select theAnswers;
-                        Question[] results = retrieved.ToArray<Question>();
-                        if (results.Length == 0) { return RedirectToAction("ResourceUnavailable", "Home"); }//If the answer doesn't exist in the database then redirect them
-                        AnswerApp.Models.Question theQuestion = results.First();
-                        byte[] pdfBytes = null;
-                        if (Practice_Problem != null)//This is a Practice Problem
-                        {
-                            pdfBytes = theQuestion.Practice_Problem.ToArray();
-                        }
-                        else//(Practice_Problem == null) This is not a Practice Problem
-                        {
-                            pdfBytes = theQuestion.Answer.ToArray(); 
-                        }
-                        return new PdfResult(pdfBytes, false, filename);
-                    }//else this answer is not the answer we're loking for so continue searching
-                }
+                        pdfBytes = theQuestion.Practice_Problem.ToArray();
+                    }
+                    else//(Practice_Problem == null) This is not a Practice Problem
+                    {
+                        pdfBytes = theQuestion.Answer.ToArray(); 
+                    }
+                    return new PdfResult(pdfBytes, false, filename);
+                }//else this answer is not the answer we're loking for so continue searching
             }
             //After checking all of the users answers, if this Answer is not listed, redirect to select page
             return RedirectToAction("Select", "Answers");
@@ -717,7 +711,8 @@ namespace AnswerApp.Controllers
             return RedirectToAction("ViewAnswer/" + User.Identity.Name, "Answers", model);
         }
 
-        public Boolean UserHasAccess(String UserName, String FileName)
+        //Determines whether a user has access to a given grouping of solutions
+        private Boolean UserHasAccess(String UserName, String FileName)
         {
             Boolean UserHasAccess = false;
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
@@ -738,49 +733,139 @@ namespace AnswerApp.Controllers
             if (theUser.Answers == null) { return false; }
             
             String[] UserAnswers = theUser.Answers.Split(new char[2] { ',', ';' });
-
+            if (UserAnswers.Length < 2) { return false; }
             foreach(String thisAnswer in UserAnswers)
             {
                 if (thisAnswer.Equals(FileName)) { return true; }//They have purchased this exact selection previously
                 String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                if (theseProperties.Length < 2) { return false; }
                 AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
-                thisModel.Textbook = properties[0];
-                thisModel.Unit = properties[1];
-                thisModel.Chapter = properties[2];
-                thisModel.Section = properties[3];
-                thisModel.Page = properties[4];
-                thisModel.Question = properties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
-                //return thisModel.Textbook.Equals(model.Textbook) &&;
-                
-                //if (thisAnswer.Equals(FileName))//YOU ARE HERE
+                thisModel.Textbook = theseProperties[0];
+                thisModel.Unit = theseProperties[1];
+                thisModel.Chapter = theseProperties[2];
+                thisModel.Section = theseProperties[3];
+                thisModel.Page = theseProperties[4];
+                thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+
+                if (thisModel.Unit.Equals("All") && thisModel.Textbook.Equals(model.Textbook))
                 {
-                    if (thisModel.Unit.Equals("All") && thisModel.Textbook.Equals(model.Textbook))
-                    {
-                        return true;
-                    }
-                    else if (thisModel.Chapter.Equals("All") && thisModel.Unit.Equals(model.Unit))
-                    {
-                        return true;
-                    }
-                    else if (thisModel.Section.Equals("All") && thisModel.Chapter.Equals(model.Chapter))
-                    {
-                        return true;
-                    }
-                    else if (thisModel.Page.Equals("All") && thisModel.Section.Equals(model.Section))
-                    {
-                        return true;
-                    }
-                    else if (thisModel.Question.Equals("All") && thisModel.Page.Equals(model.Page))
-                    {
-                        return true;
-                    }
-                    else if (thisModel.Question.Equals(model.Question))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
+                else if (thisModel.Chapter.Equals("All") && thisModel.Unit.Equals(model.Unit))
+                {
+                    return true;
+                }
+                else if (thisModel.Section.Equals("All") && thisModel.Chapter.Equals(model.Chapter))
+                {
+                    return true;
+                }
+                else if (thisModel.Page.Equals("All") && thisModel.Section.Equals(model.Section))
+                {
+                    return true;
+                }
+                else if (thisModel.Question.Equals("All") && thisModel.Page.Equals(model.Page))
+                {
+                    return true;
+                }
+                
             }
             return UserHasAccess;
+        }
+
+        private String GenerateSelectionList(SelectModel model)
+        {
+            String SelectionList = "";
+
+            AnswerApp.Models.SelectModel newModel = new AnswerApp.Models.SelectModel();
+            newModel.Textbook = model.Textbook;
+            newModel.Unit = model.Unit;
+            newModel.Chapter = model.Chapter;
+            newModel.Section = model.Section;
+            newModel.Page = model.Page;
+            newModel.Question = model.Question;
+
+            AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+            if (model.Unit.Equals("All"))//All units have been specified
+            {
+                IQueryable<AnswerApp.Models.Unit> retrieved = from theAnswers in db.Units
+                                                              where theAnswers.Textbook_Title.Equals(model.Textbook)
+                                                              select theAnswers;
+                AnswerApp.Models.Unit[] results = retrieved.ToArray<AnswerApp.Models.Unit>();
+                foreach (Unit theUnit in results)
+                {
+                    model.Unit = theUnit.Unit_Title;
+                    SelectionList += "" + theUnit.Unit_Title + "<br />" + GenerateSelectionList(model);
+                    model.Unit = "All";
+                }
+            }
+            else if (model.Chapter.Equals("All"))//Only one unit has been specified
+            {
+                IQueryable<AnswerApp.Models.Chapter> retrieved = from theAnswers in db.Chapters
+                                                                 where theAnswers.Textbook_Title.Equals(model.Textbook)
+                                                                 && theAnswers.Unit_Title.Equals(model.Unit)
+                                                                 select theAnswers;
+                AnswerApp.Models.Chapter[] results = retrieved.ToArray<AnswerApp.Models.Chapter>();
+                foreach (Chapter theChapter in results)
+                {
+                    model.Chapter = theChapter.Chapter_Title;
+                    SelectionList += "&nbsp;&nbsp;" + theChapter.Chapter_Title + "<br />" + GenerateSelectionList(model);
+                    model.Chapter = "All";
+                }
+            }
+            else if (model.Section.Equals("All"))//Only one unit has been specified
+            {
+                IQueryable<AnswerApp.Models.Section> retrieved = from theAnswers in db.Sections
+                                                                 where theAnswers.Textbook_Title.Equals(model.Textbook)
+                                                                 && theAnswers.Unit_Title.Equals(model.Unit)
+                                                                 && theAnswers.Chapter_Title.Equals(model.Chapter)
+                                                                 select theAnswers;
+                AnswerApp.Models.Section[] results = retrieved.ToArray<AnswerApp.Models.Section>();
+                foreach (Section theSection in results)
+                {
+                    model.Section = theSection.Section_Title;
+                    //newModel.Section = theSection.Section_Title
+                    SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;" + theSection.Section_Title + "<br />" + GenerateSelectionList(model);
+                    model.Section = "All";
+                }
+            }
+            else if (model.Page.Equals("All"))//Only one unit has been specified
+            {
+                IQueryable<AnswerApp.Models.Page> retrieved = from theAnswers in db.Pages
+                                                              where theAnswers.Textbook_Title.Equals(model.Textbook)
+                                                              && theAnswers.Unit_Title.Equals(model.Unit)
+                                                              && theAnswers.Chapter_Title.Equals(model.Chapter)
+                                                              && theAnswers.Section_Title.Equals(model.Section)
+                                                              select theAnswers;
+                AnswerApp.Models.Page[] results = retrieved.ToArray<AnswerApp.Models.Page>();
+                foreach (Page thePage in results)
+                {
+                    model.Page = thePage.Page_Number;
+                    //newModel.Page = thePage.Page_Number;
+                    SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + thePage.Page_Number + "<br />" + GenerateSelectionList(model);
+                    model.Page = "All";
+                }
+            }
+            else if (model.Question.Equals("All"))//Only one unit has been specified
+            {
+                IQueryable<AnswerApp.Models.Question> retrieved = from theAnswers in db.Questions
+                                                              where theAnswers.Textbook_Title.Equals(model.Textbook)
+                                                              && theAnswers.Unit_Title.Equals(model.Unit)
+                                                              && theAnswers.Chapter_Title.Equals(model.Chapter)
+                                                              && theAnswers.Section_Title.Equals(model.Section)
+                                                              && theAnswers.Page_Number.Equals(model.Page)
+                                                              select theAnswers;
+                AnswerApp.Models.Question[] results = retrieved.ToArray<AnswerApp.Models.Question>();
+                foreach (Question theQuestion in results)
+                {
+                    model.Question = theQuestion.Question_Number;
+                    //newModel.Question = theQuestion.Question_Number; 
+                    SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
+                                                                                                                                         //~/Answers/ViewAnswer/123456?Textbook=Mathematics 10&Unit=All&Chapter=All&Section=All&Page=All&Question=All
+                    model.Question = "All";
+                }
+            }
+
+            return SelectionList;
         }
     }
 }

@@ -7,11 +7,10 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
     <h2>ViewAnswer</h2>
-    
-    <embed src="/Answers/GetPdf/<%="" + Page.User.Identity.Name + "_" + ViewData["FileName"]%>" width="100%" height="1080px">&nbsp;
     <%if (Request.IsAuthenticated){%>
+    <%if(!Model.Unit.Equals("All") && !Model.Chapter.Equals("All") && !Model.Section.Equals("All") && !Model.Page.Equals("All") &&!Model.Question.Equals("All")){%>
+    <embed src="/Answers/GetPdf/<%="" + Page.User.Identity.Name + "_" + ViewData["FileName"]%>" width="100%" height="1080px">&nbsp;
     <br /><a href="/Answers/GetPdf/<%="" + Page.User.Identity.Name + "_" + ViewData["FileName"]%>"><%=ViewData["FileName"]%></a> </embed>
-    <%}%>
     <br /><%: Html.ActionLink("Select another answer to view", "Index", "Home")%>
 
     <form id="Form1" runat="server">
@@ -48,6 +47,11 @@
             <input type="submit" value="Submit" />
         
     </form>
-
-
+    <%}else{%>
+    <%=ViewData["SelectionList"] %>
+    
+    <%}%>
+    
+    <%}%>
+    
 </asp:Content>
