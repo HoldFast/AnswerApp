@@ -248,5 +248,5 @@
             PromptValue="1" />
 
     </form>
-
+<%=ViewData["SelectionList"]%>
 </asp:Content>

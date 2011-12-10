@@ -219,7 +219,6 @@ namespace AnswerApp.Controllers
                         {
                             RedirectToAction("Index", "Home");
                         }
-                        //YOU ARE HERE
                         ViewData["SelectionList"] = GenerateSelectionList(model);
                         return View("ViewAnswer", model);
                     }
@@ -259,7 +258,6 @@ namespace AnswerApp.Controllers
             {
                 model.CorrectAnswer = results.First().Practice_Problem_Answer;
             }
-            //YOU ARE HERE
             ViewData["SelectionList"] = GenerateSelectionList(model);
             return View("ViewAnswer", model);
         }
@@ -317,6 +315,31 @@ namespace AnswerApp.Controllers
 
             db.SubmitChanges();
             
+            if (model.Unit.Equals("All"))
+            {
+                ViewData["grouping"] = "Textbook";
+            }
+            else if (model.Chapter.Equals("All"))
+            {
+                ViewData["grouping"] = "Unit";
+            }
+            else if (model.Section.Equals("All"))
+            {
+                ViewData["grouping"] = "Chapter";
+            }
+            else if (model.Page.Equals("All"))
+            {
+                ViewData["grouping"] = "Section";
+            }
+            else if (model.Question.Equals("All"))
+            {
+                ViewData["grouping"] = "Page";
+            }
+            else
+            {
+                ViewData["grouping"] = "Question";
+            }
+            
             return View(model);
         }
 
@@ -373,6 +396,30 @@ namespace AnswerApp.Controllers
             }
 
             db.SubmitChanges();
+            if (model.Unit.Equals("All"))
+            {
+                ViewData["grouping"] = "Textbook";
+            }
+            else if (model.Chapter.Equals("All"))
+            {
+                ViewData["grouping"] = "Unit";
+            }
+            else if (model.Section.Equals("All"))
+            {
+                ViewData["grouping"] = "Chapter";
+            }
+            else if (model.Page.Equals("All"))
+            {
+                ViewData["grouping"] = "Section";
+            }
+            else if (model.Question.Equals("All"))
+            {
+                ViewData["grouping"] = "Page";
+            }
+            else
+            {
+                ViewData["grouping"] = "Question";
+            }
             return RedirectToAction("ViewAnswer/purchase", "Answers", model);
         }
 
@@ -712,7 +759,7 @@ namespace AnswerApp.Controllers
         }
 
         //Determines whether a user has access to a given grouping of solutions
-        private Boolean UserHasAccess(String UserName, String FileName)
+        public Boolean UserHasAccess(String UserName, String FileName)
         {
             Boolean UserHasAccess = false;
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
@@ -750,31 +797,38 @@ namespace AnswerApp.Controllers
                 if (thisModel.Unit.Equals("All") && thisModel.Textbook.Equals(model.Textbook))
                 {
                     return true;
+                    //FileName = "1";
                 }
-                else if (thisModel.Chapter.Equals("All") && thisModel.Unit.Equals(model.Unit))
+                else if (thisModel.Chapter.Equals("All") && thisModel.Unit.Equals(model.Unit) && !thisModel.Unit.Equals("All"))
                 {
                     return true;
+                    //FileName = "2";
                 }
-                else if (thisModel.Section.Equals("All") && thisModel.Chapter.Equals(model.Chapter))
+                else if (thisModel.Section.Equals("All") && thisModel.Chapter.Equals(model.Chapter) && !thisModel.Chapter.Equals("All"))
                 {
                     return true;
+                    //FileName = "3";
                 }
-                else if (thisModel.Page.Equals("All") && thisModel.Section.Equals(model.Section))
+                else if (thisModel.Page.Equals("All") && thisModel.Section.Equals(model.Section) && !thisModel.Section.Equals("All"))
                 {
                     return true;
+                    //FileName = "4";
                 }
-                else if (thisModel.Question.Equals("All") && thisModel.Page.Equals(model.Page))
+                else if (thisModel.Question.Equals("All") && thisModel.Page.Equals(model.Page) && !thisModel.Page.Equals("All"))
                 {
                     return true;
+                    //FileName = "5";
                 }
                 
             }
             return UserHasAccess;
         }
 
-        private String GenerateSelectionList(SelectModel model)
+        public String GenerateSelectionList(SelectModel model)
         {
             String SelectionList = "";
+
+
 
             AnswerApp.Models.SelectModel newModel = new AnswerApp.Models.SelectModel();
             newModel.Textbook = model.Textbook;
@@ -783,8 +837,29 @@ namespace AnswerApp.Controllers
             newModel.Section = model.Section;
             newModel.Page = model.Page;
             newModel.Question = model.Question;
+            AnswerApp.Controllers.AnswersController thisAnswerController = new AnswerApp.Controllers.AnswersController();
+
 
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+            if (model.Textbook.Equals("All"))//All Textbooks have been specified
+            {
+                IQueryable<AnswerApp.Models.Textbook> retrieved = from theAnswers in db.Textbooks
+                                                                  select theAnswers;
+                AnswerApp.Models.Textbook[] results = retrieved.ToArray<AnswerApp.Models.Textbook>();
+                foreach (Textbook theTextbook in results)
+                {
+                    model.Textbook = theTextbook.Title;
+                    if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
+                    {
+                        SelectionList += "<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    else
+                    {
+                        SelectionList += "<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    model.Textbook = "All";
+                }
+            }
             if (model.Unit.Equals("All"))//All units have been specified
             {
                 IQueryable<AnswerApp.Models.Unit> retrieved = from theAnswers in db.Units
@@ -794,7 +869,14 @@ namespace AnswerApp.Controllers
                 foreach (Unit theUnit in results)
                 {
                     model.Unit = theUnit.Unit_Title;
-                    SelectionList += "" + theUnit.Unit_Title + "<br />" + GenerateSelectionList(model);
+                    if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
+                    {
+                        SelectionList += "&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    else
+                    {
+                        SelectionList += "&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model);
+                    }
                     model.Unit = "All";
                 }
             }
@@ -808,7 +890,14 @@ namespace AnswerApp.Controllers
                 foreach (Chapter theChapter in results)
                 {
                     model.Chapter = theChapter.Chapter_Title;
-                    SelectionList += "&nbsp;&nbsp;" + theChapter.Chapter_Title + "<br />" + GenerateSelectionList(model);
+                    if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
+                    {
+                        SelectionList += "&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    else
+                    {
+                        SelectionList += "&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model);
+                    }
                     model.Chapter = "All";
                 }
             }
@@ -824,7 +913,14 @@ namespace AnswerApp.Controllers
                 {
                     model.Section = theSection.Section_Title;
                     //newModel.Section = theSection.Section_Title
-                    SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;" + theSection.Section_Title + "<br />" + GenerateSelectionList(model);
+                    if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
+                    {
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    else
+                    {
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
+                    }
                     model.Section = "All";
                 }
             }
@@ -841,26 +937,40 @@ namespace AnswerApp.Controllers
                 {
                     model.Page = thePage.Page_Number;
                     //newModel.Page = thePage.Page_Number;
-                    SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + thePage.Page_Number + "<br />" + GenerateSelectionList(model);
+                    if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
+                    {
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    else
+                    {
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
+                    }
                     model.Page = "All";
                 }
             }
             else if (model.Question.Equals("All"))//Only one unit has been specified
             {
                 IQueryable<AnswerApp.Models.Question> retrieved = from theAnswers in db.Questions
-                                                              where theAnswers.Textbook_Title.Equals(model.Textbook)
-                                                              && theAnswers.Unit_Title.Equals(model.Unit)
-                                                              && theAnswers.Chapter_Title.Equals(model.Chapter)
-                                                              && theAnswers.Section_Title.Equals(model.Section)
-                                                              && theAnswers.Page_Number.Equals(model.Page)
-                                                              select theAnswers;
+                                                                  where theAnswers.Textbook_Title.Equals(model.Textbook)
+                                                                  && theAnswers.Unit_Title.Equals(model.Unit)
+                                                                  && theAnswers.Chapter_Title.Equals(model.Chapter)
+                                                                  && theAnswers.Section_Title.Equals(model.Section)
+                                                                  && theAnswers.Page_Number.Equals(model.Page)
+                                                                  select theAnswers;
                 AnswerApp.Models.Question[] results = retrieved.ToArray<AnswerApp.Models.Question>();
                 foreach (Question theQuestion in results)
                 {
                     model.Question = theQuestion.Question_Number;
                     //newModel.Question = theQuestion.Question_Number; 
-                    SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
-                                                                                                                                         //~/Answers/ViewAnswer/123456?Textbook=Mathematics 10&Unit=All&Chapter=All&Section=All&Page=All&Question=All
+                    if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
+                    {
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    else
+                    {
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
+                    }
+                    //~/Answers/ViewAnswer/123456?Textbook=Mathematics 10&Unit=All&Chapter=All&Section=All&Page=All&Question=All
                     model.Question = "All";
                 }
             }
