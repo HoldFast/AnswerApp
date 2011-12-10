@@ -44,35 +44,6 @@ namespace AnswerApp.Controllers
                 fakeModel.Page = "All";
                 fakeModel.Question = "All";
                 ViewData["SelectionList"] = GenerateSelectionList(fakeModel);
-
-
-
-
-
-                
-                
-                //else
-                //{
-
-                    //Calculate the percentages of each textbook the user has purchased
-                    /*List<String> UserTextbooks = new List<String>(); ;
-                    List<String> UserAnswers = thisUser.Answers.Split(new char[1] { ';' }).ToList();
-                    foreach (String theAnswer in UserAnswers)
-                    {
-                        String[] AnswerProperties = theAnswer.Split(new char[1] { '_' });//AnswerProperties[0] is theTextbook
-                        if (!UserTextbooks.Contains(AnswerProperties[0]))
-                        {
-                            UserTextbooks.Add(AnswerProperties[0]);//If it is not already in the list of textbooks add it
-                            String[] AnswerPercentage = theAnswer.Split(new char[1] { ',' });
-                            Textbook thisTextbook = new Textbook();
-                            thisTextbook.TextbookTitle = AnswerProperties[0];
-                            thisTextbook.TextbookPercentage = AnswerPercentage[1];
-                            model.UserTextbooks.Add(thisTextbook);
-                        }
-                        
-                    }//*/
-                //}
-
                 return View(model);
             }
             else
@@ -150,8 +121,6 @@ namespace AnswerApp.Controllers
         {
             String SelectionList = "";
 
-
-
             AnswerApp.Models.SelectModel newModel = new AnswerApp.Models.SelectModel();
             newModel.Textbook = model.Textbook;
             newModel.Unit = model.Unit;
@@ -163,6 +132,8 @@ namespace AnswerApp.Controllers
                 
 
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
+            AnswerApp.Models.User thisUser = db.Users.Single<User>(u => u.UserName.Equals(User.Identity.Name));
+            String[] ThisUsersAnswers = thisUser.Answers.Split(new char[1] { ';' });
             if (model.Textbook.Equals("All"))//All Textbooks have been specified
             {
                 IQueryable<AnswerApp.Models.Textbook> retrieved = from theAnswers in db.Textbooks
@@ -177,7 +148,22 @@ namespace AnswerApp.Controllers
                     }
                     else
                     {
-                        SelectionList += "<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model);
+                        foreach (String thisAnswer in ThisUsersAnswers)
+                        {
+                            String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                            if (!(theseProperties.Length < 2))
+                            {
+                                AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                                thisModel.Textbook = theseProperties[0];
+                                thisModel.Unit = theseProperties[1];
+                                thisModel.Chapter = theseProperties[2];
+                                thisModel.Section = theseProperties[3];
+                                thisModel.Page = theseProperties[4];
+                                thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                                if (thisModel.Textbook.Equals(model.Textbook)) { SelectionList += "<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model); break; }
+                            }
+                            else { SelectionList += GenerateSelectionList(model); }
+                        }
                     }
                     model.Textbook = "All";
                 }
@@ -197,7 +183,22 @@ namespace AnswerApp.Controllers
                     }
                     else
                     {
-                        SelectionList += "&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model);
+                        foreach (String thisAnswer in ThisUsersAnswers)
+                        {
+                            String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                            if (!(theseProperties.Length < 2))
+                            {
+                                AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                                thisModel.Textbook = theseProperties[0];
+                                thisModel.Unit = theseProperties[1];
+                                thisModel.Chapter = theseProperties[2];
+                                thisModel.Section = theseProperties[3];
+                                thisModel.Page = theseProperties[4];
+                                thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                                if (thisModel.Unit.Equals(model.Unit)) { SelectionList += "&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model); break; }
+                            }
+                            else { SelectionList += GenerateSelectionList(model); }
+                        }
                     }
                     model.Unit = "All";
                 }
@@ -218,7 +219,22 @@ namespace AnswerApp.Controllers
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model);
+                        foreach (String thisAnswer in ThisUsersAnswers)
+                        {
+                            String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                            if (!(theseProperties.Length < 2))
+                            {
+                                AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                                thisModel.Textbook = theseProperties[0];
+                                thisModel.Unit = theseProperties[1];
+                                thisModel.Chapter = theseProperties[2];
+                                thisModel.Section = theseProperties[3];
+                                thisModel.Page = theseProperties[4];
+                                thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                                if (thisModel.Chapter.Equals(model.Chapter)) { SelectionList += "&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model); break; }
+                            }
+                            else { SelectionList += GenerateSelectionList(model); }
+                        }
                     }
                     model.Chapter = "All";
                 }
@@ -241,7 +257,22 @@ namespace AnswerApp.Controllers
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
+                        foreach (String thisAnswer in ThisUsersAnswers)
+                        {
+                            String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                            if (!(theseProperties.Length < 2))
+                            {
+                                AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                                thisModel.Textbook = theseProperties[0];
+                                thisModel.Unit = theseProperties[1];
+                                thisModel.Chapter = theseProperties[2];
+                                thisModel.Section = theseProperties[3];
+                                thisModel.Page = theseProperties[4];
+                                thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                                if (thisModel.Section.Equals(model.Section)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model); break; }
+                            }
+                            else { SelectionList += GenerateSelectionList(model); }
+                        }
                     }
                     model.Section = "All";
                 }
@@ -265,7 +296,22 @@ namespace AnswerApp.Controllers
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
+                        foreach (String thisAnswer in ThisUsersAnswers)
+                        {
+                            String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                            if (!(theseProperties.Length < 2))
+                            {
+                                AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                                thisModel.Textbook = theseProperties[0];
+                                thisModel.Unit = theseProperties[1];
+                                thisModel.Chapter = theseProperties[2];
+                                thisModel.Section = theseProperties[3];
+                                thisModel.Page = theseProperties[4];
+                                thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                                if (thisModel.Page.Equals(model.Page)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model); break; }
+                            }
+                            else { SelectionList += GenerateSelectionList(model); }
+                        }
                     }
                     model.Page = "All";
                 }
@@ -290,7 +336,22 @@ namespace AnswerApp.Controllers
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
+                        foreach (String thisAnswer in ThisUsersAnswers)
+                        {
+                            String[] theseProperties = thisAnswer.Split(new char[1] { '_' });
+                            if (!(theseProperties.Length < 2))
+                            {
+                                AnswerApp.Models.SelectModel thisModel = new AnswerApp.Models.SelectModel();
+                                thisModel.Textbook = theseProperties[0];
+                                thisModel.Unit = theseProperties[1];
+                                thisModel.Chapter = theseProperties[2];
+                                thisModel.Section = theseProperties[3];
+                                thisModel.Page = theseProperties[4];
+                                thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
+                                if (thisModel.Question.Equals(model.Question)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model); break; }
+                            }
+                            else { SelectionList += GenerateSelectionList(model); }
+                        }
                     }
                     //~/Answers/ViewAnswer/123456?Textbook=Mathematics 10&Unit=All&Chapter=All&Section=All&Page=All&Question=All
                     model.Question = "All";

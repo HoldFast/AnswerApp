@@ -281,21 +281,29 @@ namespace AnswerApp.Controllers
              * Use String.Replace to finally replace the Purchase_ clause
              * Then split the answer string based on the 
              * replacing string (which must also be a single character) 
-             * "*" for example.
-             * Save each component of the string so that it can be 
-             * reconstructed to the original answer string for that user
-             * The frist string in the array will be al answers 
-             * before the recent purcahse, the following strings will be
-             * all purchases after that one.
-             * It is important to note that all of the strings other than the first
-             * will be ones that started with purchase meaning they will have the
-             * answer that has just been purchased plus all answers already payed for
-             * after that purcahase up until the next new purchase.
-             * Each of these substrings should be split on the ';' character to isolate 
-             * the file name of the solution just purchased.  
-             * 
-             * Or the easy way is to replace "Purchase_" with "".
-             * //*/
+             * "*" for example.*/
+            String thisUsersAnswers = thisUser.Answers.Replace("Purchase_", "*");// += Filename_of_Solution_to_Purchase +";";
+            String[] Solution_Just_Purchased = thisUsersAnswers.Split(new char[1] { '*' });
+            if (Solution_Just_Purchased.Length > 1)
+            {
+                String[] Local_Filename_of_Solution_to_Purchase = Solution_Just_Purchased[1].Split(new char[1] { ';' });
+                String InvalidPurchase = Local_Filename_of_Solution_to_Purchase[1];
+                thisUser.Answers = thisUser.Answers.Replace("Purchase_" + InvalidPurchase, "");
+            }
+            /* Save each component of the string so that it can be 
+            * reconstructed to the original answer string for that user
+            * The frist string in the array will be al answers 
+            * before the recent purcahse, the following strings will be
+            * all purchases after that one.
+            * It is important to note that all of the strings other than the first
+            * will be ones that started with purchase meaning they will have the
+            * answer that has just been purchased plus all answers already payed for
+            * after that purcahase up until the next new purchase.
+            * Each of these substrings should be split on the ';' character to isolate 
+            * the file name of the solution just purchased.  
+            * 
+            * Or the easy way is to replace "Purchase_" with "".
+            * //*/
             thisUser.Answers += "" + "Purchase_" + filename + ";";//Purchase indicates that the item is not yet payed for.
 
             model.CorrectAnswer = "Error 3";
@@ -851,11 +859,11 @@ namespace AnswerApp.Controllers
                     model.Textbook = theTextbook.Title;
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
-                        SelectionList += "<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "<a style=\"color: #FF0000\" href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theTextbook.Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     model.Textbook = "All";
                 }
@@ -871,11 +879,11 @@ namespace AnswerApp.Controllers
                     model.Unit = theUnit.Unit_Title;
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
-                        SelectionList += "&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;<a style=\"color: #FF0000\" href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theUnit.Unit_Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     model.Unit = "All";
                 }
@@ -892,11 +900,11 @@ namespace AnswerApp.Controllers
                     model.Chapter = theChapter.Chapter_Title;
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theChapter.Chapter_Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     model.Chapter = "All";
                 }
@@ -915,11 +923,11 @@ namespace AnswerApp.Controllers
                     //newModel.Section = theSection.Section_Title
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     model.Section = "All";
                 }
@@ -939,11 +947,11 @@ namespace AnswerApp.Controllers
                     //newModel.Page = thePage.Page_Number;
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
                     }
                     model.Page = "All";
                 }
@@ -964,11 +972,11 @@ namespace AnswerApp.Controllers
                     //newModel.Question = theQuestion.Question_Number; 
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
                     }
                     //~/Answers/ViewAnswer/123456?Textbook=Mathematics 10&Unit=All&Chapter=All&Section=All&Page=All&Question=All
                     model.Question = "All";
