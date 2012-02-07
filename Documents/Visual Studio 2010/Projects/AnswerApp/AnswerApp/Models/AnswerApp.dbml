@@ -1,19 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="AnswerDatabase" Class="AnswerAppDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Connection Mode="WebSettings" ConnectionString="Data Source=.\SQLEXPRESS;AttachDbFilename=|DataDirectory|\AnswerDatabase.mdf;Integrated Security=True;User Instance=True" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="AnswerDatabaseConnectionString" Provider="System.Data.SqlClient" />
-  <Table Name="dbo.All_Books" Member="All_Books">
-    <Type Name="All_Book">
-      <Column Name="Unique_Id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Edition" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Publisher" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Date_of_Publication" Type="System.DateTime" DbType="Date" CanBeNull="true" />
-      <Column Name="Number_of_Units" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Number_of_Chapters" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Number_of_Sections" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Number_of_Pages" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="Number_of_Questions" Type="System.Int32" DbType="Int" CanBeNull="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.[User]" Member="Users">
     <Type Name="User">
       <Column Name="Unique_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -24,16 +10,6 @@
       <Column Name="MetaData" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Book" Member="Books">
-    <Type Name="Book">
-      <Column Name="Unique_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Unit" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Chapter" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Section" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Page" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Question" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Chapter" Member="Chapters">
     <Type Name="Chapter">
       <Column Name="Chapter_Id" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -42,16 +18,6 @@
       <Column Name="Unit_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="Textbook_Id" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="Textbook_Title" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.[Mathematics 10]" Member="Mathematics_10s">
-    <Type Name="Mathematics_10">
-      <Column Name="Unique_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Unit" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Chapter" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Section" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Page" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Question" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.Page" Member="Pages">
@@ -85,16 +51,6 @@
       <Column Name="Answer" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="Practice_Problem" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="Practice_Problem_Answer" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.[Science 10]" Member="Science_10s">
-    <Type Name="Science_10">
-      <Column Name="Unique_Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Unit" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Chapter" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Section" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Page" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="Question" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.Section" Member="Sections">

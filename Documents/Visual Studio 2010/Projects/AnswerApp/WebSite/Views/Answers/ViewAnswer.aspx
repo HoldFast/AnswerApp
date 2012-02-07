@@ -1,12 +1,12 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<AnswerApp.Models.SelectModel>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-    ViewAnswer
+    View Solution
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>ViewAnswer</h2>
+    <h2>View Solution</h2>
     <%if (Request.IsAuthenticated){%>
     <%if(!Model.Unit.Equals("All") && !Model.Chapter.Equals("All") && !Model.Section.Equals("All") && !Model.Page.Equals("All") &&!Model.Question.Equals("All")){%>
     <embed src="/Answers/GetPdf/<%="" + Page.User.Identity.Name + "_" + ViewData["FileName"]%>" width="100%" height="1080px">&nbsp;
@@ -48,8 +48,9 @@
         
     </form>
     <%}else{%>
-    <%=ViewData["SelectionList"] %>
-    
+    Please select a solution from the following list to view:  <br /><br />
+    <%=ViewData["SelectionList"] %><br />
+    The above list shows all solutions on your account from within your selection.
     <%}%>
     
     <%}%>

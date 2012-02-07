@@ -13,22 +13,12 @@ namespace AnswerApp.Controllers
 {
     public class HomeController : Controller
     {
-
-        // data GET service
-        public JsonResult getUser(int id)
-        {
-            AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
-            User user = db.Users.Single(u => u.Unique_Id == 4);
-            return Json(user, JsonRequestBehavior.AllowGet);
-        }
-
         public ActionResult Index(HomeModel model)
         {
             if (Request.IsAuthenticated)
             {
                 ViewBag.Message = "The Answer App";
-                //String Username = User.Identity.Name;
-                ViewBag.Username = User.Identity.Name;//Username;
+                ViewBag.Username = User.Identity.Name;
                 
                 AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
 
@@ -53,7 +43,7 @@ namespace AnswerApp.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(HomeModel model, string returnUrl)
+        public ActionResult Index(HomeModel model, String returnUrl)
         {
             //Extract the known catagory values from the user's meta data
             AnswerApp.Models.AnswerAppDataContext db = new AnswerAppDataContext();
@@ -100,6 +90,10 @@ namespace AnswerApp.Controllers
             {
                 Unit_Title = db.Chapters.Single<Chapter>(c => c.Chapter_Title.Equals(Chapter_Title)).Unit_Title;
             }
+            if (Textbook_Title.Equals("Select a Textbook"))
+            {
+                return View();
+            }
 
             AnswerApp.Models.SelectModel theSelectModel = new SelectModel();
             theSelectModel.Textbook = Textbook_Title;
@@ -133,6 +127,7 @@ namespace AnswerApp.Controllers
 
             AnswerApp.Models.AnswerAppDataContext db = new AnswerApp.Models.AnswerAppDataContext();
             AnswerApp.Models.User thisUser = db.Users.Single<User>(u => u.UserName.Equals(User.Identity.Name));
+            if (thisUser.Answers == null) { return null; }
             String[] ThisUsersAnswers = thisUser.Answers.Split(new char[1] { ';' });
             if (model.Textbook.Equals("All"))//All Textbooks have been specified
             {
@@ -250,10 +245,9 @@ namespace AnswerApp.Controllers
                 foreach (Section theSection in results)
                 {
                     model.Section = theSection.Section_Title;
-                    //newModel.Section = theSection.Section_Title
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">Section " + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
@@ -269,7 +263,7 @@ namespace AnswerApp.Controllers
                                 thisModel.Section = theseProperties[3];
                                 thisModel.Page = theseProperties[4];
                                 thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
-                                if (thisModel.Section.Equals(model.Section)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model); break; }
+                                if (thisModel.Section.Equals(model.Section)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">Section " + theSection.Section_Title + "</a><br />" + GenerateSelectionList(model); break; }
                             }
                             else { SelectionList += GenerateSelectionList(model); }
                         }
@@ -289,10 +283,9 @@ namespace AnswerApp.Controllers
                 foreach (Page thePage in results)
                 {
                     model.Page = thePage.Page_Number;
-                    //newModel.Page = thePage.Page_Number;
                     if (UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">Page " + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
@@ -308,7 +301,7 @@ namespace AnswerApp.Controllers
                                 thisModel.Section = theseProperties[3];
                                 thisModel.Page = theseProperties[4];
                                 thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
-                                if (thisModel.Page.Equals(model.Page)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model); break; }
+                                if (thisModel.Page.Equals(model.Page)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">Page " + thePage.Page_Number + "</a><br />" + GenerateSelectionList(model); break; }
                             }
                             else { SelectionList += GenerateSelectionList(model); }
                         }
@@ -329,10 +322,9 @@ namespace AnswerApp.Controllers
                 foreach (Question theQuestion in results)
                 {
                     model.Question = theQuestion.Question_Number;
-                    //newModel.Question = theQuestion.Question_Number; 
                     if(UserHasAccess(User.Identity.Name, model.Textbook + "_" + model.Unit + "_" + model.Chapter + "_" + model.Section + "_" + model.Page + "_" + model.Question + ".pdf"))
                     {
-                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
+                        SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">Question " + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model);
                     }
                     else
                     {
@@ -348,12 +340,11 @@ namespace AnswerApp.Controllers
                                 thisModel.Section = theseProperties[3];
                                 thisModel.Page = theseProperties[4];
                                 thisModel.Question = theseProperties[5].Split(new char[1] { '.' })[0];//Truncate ".pdf" from the end of the file name
-                                if (thisModel.Question.Equals(model.Question)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">" + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model); break; }
+                                if (thisModel.Question.Equals(model.Question)) { SelectionList += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\"color: #FF0000\" href=\"Answers/ViewAnswer/" + User.Identity.Name + "?Textbook=" + model.Textbook + "&Unit=" + model.Unit + "&Chapter=" + model.Chapter + "&Section=" + model.Section + "&Page=" + model.Page + "&Question=" + model.Question + "\">Question " + theQuestion.Question_Number + "</a><br />" + GenerateSelectionList(model); break; }
                             }
                             else { SelectionList += GenerateSelectionList(model); }
                         }
                     }
-                    //~/Answers/ViewAnswer/123456?Textbook=Mathematics 10&Unit=All&Chapter=All&Section=All&Page=All&Question=All
                     model.Question = "All";
                 }
             }

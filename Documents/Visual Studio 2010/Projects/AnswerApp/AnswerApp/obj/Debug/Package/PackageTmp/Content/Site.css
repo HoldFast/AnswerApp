@@ -219,7 +219,9 @@ table {
     border-collapse: collapse;
 }
 
-table td {
+table td 
+{
+    vertical-align: top;
     padding: 5px;
     border: none;
 }
