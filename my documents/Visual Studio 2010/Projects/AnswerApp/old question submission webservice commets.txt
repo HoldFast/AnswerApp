@@ -1,0 +1,65 @@
+            /*
+            StringDictionary previousKnownCatagories = CascadingDropDown.ParseKnownCategoryValuesString(thisUser.MetaData);
+//            DictionaryEntry[] previousCatagoryArray = new DictionaryEntry[previousKnownCatagories.Count];
+//            previousKnownCatagories.CopyTo(previousCatagoryArray, 0);
+            
+            String compiledKnownCategoryValues = "";
+            if (incomingKnownCatagories.ContainsKey("textbook"))
+            {
+                if (previousKnownCatagories.ContainsKey("textbook"))
+                {
+                    previousKnownCatagories["textbook"] = incomingKnownCatagories["textbook"];
+                }
+                previousKnownCatagories.Add("textbook", incomingKnownCatagories["textbook"]);
+                compiledKnownCategoryValues += "Textbook:" + previousKnownCatagories["textbook"] + ";";
+            }
+            if (incomingKnownCatagories.ContainsKey("unit"))
+            {
+                if (previousKnownCatagories.ContainsKey("unit"))
+                {
+                    previousKnownCatagories["unit"] = incomingKnownCatagories["unit"];
+                }
+                previousKnownCatagories.Add("unit", incomingKnownCatagories["unit"]);
+                compiledKnownCategoryValues += "Unit:" + previousKnownCatagories["unit"] + ";";
+            }
+            if (incomingKnownCatagories.ContainsKey("chapter"))
+            {
+                if (previousKnownCatagories.ContainsKey("chapter"))
+                {
+                    previousKnownCatagories["chapter"] = incomingKnownCatagories["chapter"];
+                }
+                previousKnownCatagories.Add("chapter", incomingKnownCatagories["chapter"]);
+                compiledKnownCategoryValues += "Chapter:" + previousKnownCatagories["chapter"] + ";";
+            }
+            if (incomingKnownCatagories.ContainsKey("section"))
+            {
+                if (previousKnownCatagories.ContainsKey("section"))
+                {
+                    previousKnownCatagories["section"] = incomingKnownCatagories["section"];
+                }
+                previousKnownCatagories.Add("section", incomingKnownCatagories["section"]);
+                compiledKnownCategoryValues += "Section:" + previousKnownCatagories["section"] + ";";
+            }
+            if (incomingKnownCatagories.ContainsKey("page"))
+            {
+                if (previousKnownCatagories.ContainsKey("page"))
+                {
+                    previousKnownCatagories["page"] = incomingKnownCatagories["page"];
+                }
+                previousKnownCatagories.Add("page", incomingKnownCatagories["page"]);
+                compiledKnownCategoryValues += "Page:" + previousKnownCatagories["page"] + ";";
+            }
+            if (incomingKnownCatagories.ContainsKey("question"))
+            {
+                if (previousKnownCatagories.ContainsKey("question"))
+                {
+                    previousKnownCatagories["question"] = incomingKnownCatagories["question"];
+                }
+                previousKnownCatagories.Add("question", incomingKnownCatagories["question"]);
+                compiledKnownCategoryValues += "Question:" + previousKnownCatagories["question"] + ";";
+            }
+
+            //DictionaryEntry[] previousCatagoryArray = new DictionaryEntry[previousKnownCatagories.Count];
+            //previousKnownCatagories.CopyTo(previousCatagoryArray, 0);
+            */
+            //thisUser.MetaData = compiledKnownCategoryValues;// + knownCategoryValues;

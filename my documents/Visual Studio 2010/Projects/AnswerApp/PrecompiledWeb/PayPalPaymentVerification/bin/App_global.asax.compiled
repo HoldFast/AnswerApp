@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="8" virtualPath="/PayPalPaymentVerification/global.asax" hash="17cda3fb" filehash="ffffecd1758115cd" flags="150000" assembly="App_global.asax" type="ASP.global_asax">
+    <filedeps>
+        <filedep name="/PayPalPaymentVerification/global.asax" />
+    </filedeps>
+</preserve>
